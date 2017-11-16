@@ -1,0 +1,7 @@
+[package]
+name = "genmei"
+version = "0.1.0"
+authors = ["abhijeetbhagat"]
+
+[dependencies]
+serde="*"
