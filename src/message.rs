@@ -5,5 +5,6 @@ enum Message {
     StreamInvocation,
     StreamItem,
     Completion,
-    CancelInvocation
+    CancelInvocation,
+    Ping
 }
