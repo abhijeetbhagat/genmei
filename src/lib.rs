@@ -6,7 +6,7 @@ extern crate serde;
 extern crate serde_json;
 mod message;
 mod protocol;
-
+mod hubproxy; 
 
 #[cfg(test)]
 mod tests {
