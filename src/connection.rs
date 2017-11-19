@@ -1,4 +1,4 @@
-use hubproxy::{HubProxy, Proxy};
+use hubproxy::{Proxy};
 use hubresult::HubResult;
 use std::collections::HashMap;
 
@@ -7,21 +7,21 @@ trait HubConnect {
     fn remove_callback (&mut self, id : String);
 }
 
-struct HubConnection {
+pub struct HubConnection {
     url : String,
     callbacks_map : HashMap<String, fn(HubResult)>
 }
 
 impl HubConnection {
-    fn new (url : String) -> Self {
+    pub fn new (url : String) -> Self {
         HubConnection {
             url : url,
             callbacks_map : HashMap::new()
         }
     }
 
-    fn create_hub_proxy () -> Box<HubProxy> {
-        Box::new (Proxy::new ())
+    pub fn create_hub_proxy (&self) -> Proxy {
+        Proxy::new ()
     }
 }
 
