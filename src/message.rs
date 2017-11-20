@@ -11,3 +11,15 @@ pub enum Message {
     CancelInvocation { _type : i32, invocationId : String },
     Ping
 }
+
+#[derive (Serialize, Deserialize)]
+pub struct InvocationMessage {
+    #[serde (rename = "I")]
+    pub callback_id : String,
+    #[serde (rename = "H")]
+    pub hub : String,
+    #[serde (rename = "M")]
+    pub method : String, 
+    #[serde (rename = "A")]
+    pub args : Vec<Value>
+}
