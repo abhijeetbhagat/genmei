@@ -36,7 +36,7 @@ impl<'a> Proxy<'a> {
         a.downcast_ref::<Self>().unwrap()
     }*/
 
-    fn invoke<T, E> (&self, method : String) -> FutureResult<T, E> {
+    pub fn invoke<T, E> (&self, method : String) -> FutureResult<T, E> {
         //TODO abhi : remove macro after implementation
         unimplemented!();
         let message = InvocationMessage {

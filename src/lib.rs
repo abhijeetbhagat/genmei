@@ -17,6 +17,7 @@ mod hubresult;
 mod tests {
     use serde_json;
     use message;
+    use message::{InvocationMessage};
     use connection::HubConnection;
     use hubproxy::Proxy;
     use std::mem;
@@ -30,10 +31,22 @@ mod tests {
     #[test]
     fn test_connection_create() {
         let connection = HubConnection::new (String::from("http://localhost:8080"));
-        let proxy = connection.create_hub_proxy ();
+        let proxy = connection.create_hub_proxy (String::from ("MyHub"));
 
         //let p = Proxy::from (&*proxy) ;
         proxy.on::<String> (String::from ("addMessage"), |s| {});
-        proxy.invoke (String::from ("addMessage"));
+        proxy.invoke::<i32, i32> (String::from ("addMessage"));
+    }
+
+    #[test]
+    fn test_invocation_message_serialize () {
+        let message = InvocationMessage {
+            callback_id : String::from ("9"),
+            hub : String::from ("MyHub"),
+            method : String::from ("send"),
+            args : vec![]
+        };
+        assert_eq! (serde_json::to_string (&message).unwrap(), 
+                    "{\"I\":\"9\",\"H\":\"MyHub\",\"M\":\"send\",\"A\":[]}");
     }
 }
