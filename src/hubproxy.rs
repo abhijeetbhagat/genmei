@@ -1,7 +1,10 @@
 use std::any::Any;
-use futures::future::FutureResult;
+use futures::prelude::*;
+//use futures::future::Future;
 use connection::HubConnection;
 use message::{Message, InvocationMessage};
+use serde_json::Value;
+use erased_serde::Serialize;
 
 /* Due to E0038, we aren't using this trait
  * TODO abhi: need to revisit if necessary
@@ -36,14 +39,21 @@ impl<'a> Proxy<'a> {
         a.downcast_ref::<Self>().unwrap()
     }*/
 
-    pub fn invoke<T, E> (&self, method : String) -> FutureResult<T, E> {
+    pub fn invoke (&self,
+                   method : String,
+                   args : Vec<&Serialize>) -> Box<Future<Item=(), Error=()>> {
         //TODO abhi : remove macro after implementation
         unimplemented!();
+        let mut _args = vec![];
+        for a in args {
+            _args.push (json! (a));
+        }
+
         let message = InvocationMessage {
             callback_id : String::from ("9"),
             hub : self.hub_name.clone(),
             method : method,
-            args : vec![]
+            args : _args
         };
 
         let data = self.connection.json_serialize_object (&message).unwrap();

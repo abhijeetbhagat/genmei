@@ -35,7 +35,7 @@ impl HubConnection {
 
     }
 
-    fn start<T, E> (&self) -> FutureResult<T, E> {
+    pub fn start<T, E> (&self) -> FutureResult<T, E> {
         //TODO abhi initiate a connection to the server here
         unimplemented!();
 
@@ -64,7 +64,7 @@ pub struct HubConnectionBuilder {
 }
 
 impl HubConnectionBuilder {
-    fn new(url : String) -> Self {
+    pub fn new(url : String) -> Self {
         HubConnectionBuilder {
             url : url, 
             use_default_url : false,
@@ -73,29 +73,29 @@ impl HubConnectionBuilder {
         }
     }
 
-    fn with_query_string (mut self, query_string : String) -> HubConnectionBuilder {
+    pub fn with_query_string (mut self, query_string : String) -> HubConnectionBuilder {
         self.query_string = Some(query_string);
         self
     }
 
-    fn use_default_url (mut self, use_default_url : bool) -> HubConnectionBuilder {
+    pub fn use_default_url (mut self, use_default_url : bool) -> HubConnectionBuilder {
         self.use_default_url = use_default_url;
         self
     }
 
-    fn with_query_map (mut self,
+    pub fn with_query_map (mut self,
                        query_string_map : HashMap<String, String>) -> HubConnectionBuilder {
         self.query_string_map = Some (query_string_map);
         self
     }
 
     //TODO abhi: do we want to consume the builder?
-    fn finish (self) -> HubConnection {
+    pub fn finish (self) -> HubConnection {
         HubConnection {
             url : self.url,
             use_default_url : self.use_default_url,
-            query_string : self.query_string.unwrap(),
-            query_string_map : self.query_string_map.unwrap(),
+            query_string : self.query_string.unwrap_or (String::from ("")),
+            query_string_map : self.query_string_map.unwrap_or ( HashMap::new()),
             callbacks_map : HashMap::new()
 
         }

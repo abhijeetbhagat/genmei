@@ -6,6 +6,7 @@ extern crate serde_derive;
 extern crate serde;
 #[macro_use]
 extern crate serde_json;
+extern crate erased_serde;
 extern crate futures;
 extern crate hyper;
 extern crate tokio_core;
@@ -16,16 +17,16 @@ mod connection;
 mod hubresult; 
 mod httpbasedtransport; 
 mod httpclient;
-mod hubconnectionbuilder;
 
 #[cfg(test)]
 mod tests {
     use serde_json;
     use message;
     use message::{InvocationMessage};
-    use connection::HubConnection;
+    use connection::{HubConnection, HubConnectionBuilder};
     use hubproxy::Proxy;
     use std::mem;
+    use futures::future::Future;
 
     #[test]
     fn test_message_serialization_to_json() {
@@ -35,13 +36,15 @@ mod tests {
 
     #[test]
     fn test_connection_create() {
-        let connection = HubConnection::new (String::from("http://localhost:8080"));
+        let connection = HubConnectionBuilder::new (String::from("http://localhost:8080"))
+                            .use_default_url (false)
+                            .finish();
         let proxy = connection.create_hub_proxy (String::from ("MyHub"));
 
         //let p = Proxy::from (&*proxy) ;
         proxy.on::<String> (String::from ("addMessage"), |s| {});
-        proxy.invoke::<i32, i32> (String::from ("addMessage"));
-        connection.start().wait();
+        proxy.invoke (String::from ("addMessage"), vec![&String::from ("abhi"), &1 ]);
+        connection.start::<(), ()>().wait();
     }
 
     #[test]
