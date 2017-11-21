@@ -49,5 +49,9 @@ impl<'a> Proxy<'a> {
         let data = self.connection.json_serialize_object (&message).unwrap();
         self.connection.send (data);
     }
+
+    pub fn subscribe (event : String) {
+
+    }
 }
 

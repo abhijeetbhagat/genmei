@@ -7,11 +7,16 @@ extern crate serde;
 #[macro_use]
 extern crate serde_json;
 extern crate futures;
+extern crate hyper;
+extern crate tokio_core;
 mod message;
 mod protocol;
 mod hubproxy; 
 mod connection; 
 mod hubresult; 
+mod httpbasedtransport; 
+mod httpclient;
+mod hubconnectionbuilder;
 
 #[cfg(test)]
 mod tests {
@@ -36,6 +41,7 @@ mod tests {
         //let p = Proxy::from (&*proxy) ;
         proxy.on::<String> (String::from ("addMessage"), |s| {});
         proxy.invoke::<i32, i32> (String::from ("addMessage"));
+        connection.start().wait();
     }
 
     #[test]
