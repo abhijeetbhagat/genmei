@@ -17,6 +17,7 @@ mod connection;
 mod hubresult; 
 mod httpbasedtransport; 
 mod httpclient;
+mod subscription;
 
 #[cfg(test)]
 mod tests {

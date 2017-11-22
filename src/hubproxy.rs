@@ -5,6 +5,8 @@ use connection::HubConnection;
 use message::{Message, InvocationMessage};
 use serde_json::Value;
 use erased_serde::Serialize;
+use subscription::Subscription;
+use std::collections::HashMap;
 
 /* Due to E0038, we aren't using this trait
  * TODO abhi: need to revisit if necessary
@@ -14,14 +16,16 @@ use erased_serde::Serialize;
 
 pub struct Proxy<'a> {
     connection : &'a HubConnection,
-    hub_name : String
+    hub_name : String,
+    subscriptions : HashMap<String, Subscription>
 }
 
 impl<'a> Proxy<'a> {
     pub fn new (connection : &'a HubConnection, name : String) -> Self {
         Proxy {
             connection : connection,
-            hub_name : name
+            hub_name : name,
+            subscriptions : HashMap::new()
         }
     }
 
