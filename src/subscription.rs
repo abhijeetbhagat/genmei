@@ -7,7 +7,7 @@ pub struct Subscription {
 }
 
 impl Subscription {
-    fn new () -> Self {
+    pub fn new () -> Self {
         Subscription {
             received : None
         }
