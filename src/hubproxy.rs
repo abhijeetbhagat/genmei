@@ -32,7 +32,7 @@ impl<'a> Proxy<'a> {
     //not part of HubProxy because it would cause E0038
     //this will now make the api usage awkward since the trait object now needs a downcast
     //TODO abhi: rework on moving this to an appropriate place
-    pub fn on<T> (&mut self, event_name : String, f : fn(T)) {
+    pub fn on<T> (&'a mut self, event_name : String, f : fn(T)) {
         self.subscribe (event_name);
 
     }
@@ -65,10 +65,11 @@ impl<'a> Proxy<'a> {
         self.connection.send (data);
     }
 
-    pub fn subscribe (&mut self, event : String) -> Subscription {
-        unimplemented!();
-        self.subscriptions.insert (event, Subscription::new());
-
+    pub fn subscribe (&'a mut self, event : String) -> &'a Subscription {
+        if (!self.subscriptions.contains_key (&event)) {
+            self.subscriptions.insert (event.clone(), Subscription::new());
+        }
+        &self.subscriptions.get (&event).unwrap()
     }
 }
 
