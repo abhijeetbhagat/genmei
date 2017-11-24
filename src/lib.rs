@@ -29,6 +29,7 @@ mod tests {
     use std::mem;
     use futures::future::Future;
 
+    //http://localhost:8080/signalr/send?clientProtocol=1.4&transport=serverSentEvents&connectionData=[%7B%22Name%22:%22MyHub%22%7D]&connectionToken=AQAAANCMnd8BFdERjHoAwE%2FCl%2BsBAAAAJKIyAZXvi0e08Sl079QEAAAAAAACAAAAAAADZgAAwAAAABAAAABKuV%2Bxe15SC20qoS1GIkm0AAAAAASAAACgAAAAEAAAANuqwbda%2FDjBwm7ikQKzgCwoAAAAkgvwaH5thyZv8X9ug41XupjSvsRPTX9XV0Np2QnUA3xpEI6mtigCXRQAAADTkkV58tskB3sVw1IBT%2FoxWDt8IQ%3D%3D
     #[test]
     fn test_message_serialization_to_json() {
         assert_eq!(serde_json::to_string(&message::Message::StreamItem {_type:0, invocationId:String::from("a"), item:serde_json::json!(1)}).unwrap(), 
@@ -40,10 +41,9 @@ mod tests {
         let connection = HubConnectionBuilder::new (String::from("http://localhost:8080"))
                             .use_default_url (false)
                             .finish();
-        let proxy = connection.create_hub_proxy (String::from ("MyHub"));
+        let mut proxy = connection.create_hub_proxy (String::from ("MyHub"));
 
-        //let p = Proxy::from (&*proxy) ;
-        proxy.on::<String> (String::from ("addMessage"), |s| {});
+        proxy.on::<String> (String::from ("addMessage"), Box::new (|s| {}));
         proxy.invoke (String::from ("addMessage"), vec![&String::from ("abhi"), &1 ]);
         connection.start::<(), ()>().wait();
     }
