@@ -44,7 +44,7 @@ mod tests {
         let mut proxy = connection.create_hub_proxy (String::from ("MyHub"));
 
         proxy.on::<String> (String::from ("addMessage"), Box::new (|s| {}));
-        proxy.invoke (String::from ("addMessage"), vec![&String::from ("abhi"), &1 ]);
+        proxy.invoke (String::from ("addMessage"), vec![&String::from ("abhi"), &1]);
         connection.start::<(), ()>().wait();
     }
 
