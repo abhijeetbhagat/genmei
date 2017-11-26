@@ -5,6 +5,7 @@ use serde::ser::Serialize;
 use serde_json;
 use serde_json::Result;
 use futures::future::FutureResult;
+use version::Version;
 
 trait HubConnect {
     fn register_callback (&mut self, fn(HubResult));
@@ -16,7 +17,15 @@ pub struct HubConnection {
     use_default_url : bool,
     query_string : String,
     query_string_map : HashMap<String, String>,
-    callbacks_map : HashMap<String, fn(HubResult)>
+    callbacks_map : HashMap<String, fn(HubResult)>,
+    pub headers : HashMap<String, String>,
+    on_received : Option<Box<Fn(String)>>,
+    on_closed : Option<Box<Fn(String)>>,
+    on_connectionslow : Option<Box<Fn(String)>>,
+    on_reconnecting : Option<Box<Fn(String)>>,
+    on_reconnected : Option<Box<Fn(String)>>,
+    on_statechanged : Option<Box<Fn(String)>>,
+    protocol : Version 
 }
 
 impl HubConnection {
@@ -43,6 +52,38 @@ impl HubConnection {
 
     pub fn json_serialize_object<T : Serialize> (&self, object : &T) -> Result<String> {
         serde_json::to_string (object)
+    }
+
+    pub fn on_received (&mut self, handler : Box<Fn(String)>) {
+        self.on_received = Some(handler);
+    }
+
+    pub fn on_closed (&mut self, handler : Box<Fn(String)>) {
+        self.on_closed = Some(handler);
+    }
+
+    pub fn on_connectionslow (&mut self, handler : Box<Fn(String)>) {
+        self.on_connectionslow = Some(handler);
+    }
+
+    pub fn on_reconnecting (&mut self, handler : Box<Fn(String)>) {
+        self.on_reconnecting = Some(handler);
+    }
+
+    pub fn on_reconnected (&mut self, handler : Box<Fn(String)>) {
+        self.on_reconnected = Some(handler);
+    }
+
+    pub fn on_statechanged (&mut self, handler : Box<Fn(String)>) {
+        self.on_statechanged = Some(handler);
+    }
+
+    pub fn get_url (&self) -> &String {
+        &self.url
+    }
+
+    pub fn get_protocol (&self) -> String {
+        self.protocol.to_string()
     }
 }
 
@@ -96,8 +137,15 @@ impl HubConnectionBuilder {
             use_default_url : self.use_default_url,
             query_string : self.query_string.unwrap_or (String::from ("")),
             query_string_map : self.query_string_map.unwrap_or ( HashMap::new()),
-            callbacks_map : HashMap::new()
-
+            callbacks_map : HashMap::new(),
+            headers : HashMap::new(),
+            on_received : None,
+            on_closed : None,
+            on_connectionslow : None,
+            on_reconnecting : None,
+            on_reconnected : None,
+            on_statechanged : None,
+            protocol : Version::new (1, 4) //TODO abhi: should this be read from a config file?
         }
     }
 }
