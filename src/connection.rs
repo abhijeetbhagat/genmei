@@ -25,7 +25,8 @@ pub struct HubConnection {
     on_reconnecting : Option<Box<Fn(String)>>,
     on_reconnected : Option<Box<Fn(String)>>,
     on_statechanged : Option<Box<Fn(String)>>,
-    protocol : Version 
+    protocol : Version,
+    connection_token : String
 }
 
 impl HubConnection {
@@ -84,6 +85,10 @@ impl HubConnection {
 
     pub fn get_protocol (&self) -> String {
         self.protocol.to_string()
+    }
+
+    pub fn get_connection_token (&self) -> &String {
+        &self.connection_token
     }
 }
 
@@ -145,7 +150,8 @@ impl HubConnectionBuilder {
             on_reconnecting : None,
             on_reconnected : None,
             on_statechanged : None,
-            protocol : Version::new (1, 4) //TODO abhi: should this be read from a config file?
+            protocol : Version::new (1, 4), //TODO abhi: should this be read from a config file?
+            connection_token : String::new()
         }
     }
 }

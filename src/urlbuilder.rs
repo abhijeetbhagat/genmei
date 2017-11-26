@@ -3,13 +3,17 @@ use connection::HubConnection;
 pub struct UrlBuilder;
 
 impl UrlBuilder {
-    pub fn create_base_url<'a>(connection : &'a HubConnection, command : &str) -> String {
+    pub fn create_base_url<'a>(connection : &'a HubConnection, 
+                               command : &str,
+                               transport : &str,
+                               connection_data : &str) -> String {
         let mut url = String::new();
         url.push_str (connection.get_url().as_str());
         url.push_str (command);
         url.push ('?');
         UrlBuilder::append_client_protocol (&mut url, connection);
-        UrlBuilder::append_transport (&mut url, "serverSentEvents");
+        UrlBuilder::append_transport (&mut url, transport);
+        UrlBuilder::append_connection_data (&mut url, connection.get_connection_token().as_str());
         url 
     }
 
@@ -25,4 +29,16 @@ impl UrlBuilder {
         url.push ('&');
     }
 
+    fn append_connection_data (url : &mut String, connection_data : &str) {
+        url.push_str ("connectionData=");
+        url.push_str (connection_data);
+        url.push ('&');
+    }
+
+    fn append_connection_token (url : &mut String, connection_token : &str) {
+        url.push_str ("connectionToken=");
+        url.push_str (connection_token);
+        url.push ('&');
+
+    }
 }
