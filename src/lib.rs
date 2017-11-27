@@ -130,7 +130,7 @@ mod tests {
     #[test]
     fn test_http_client(){
         let mut http_client = HttpClient::new();
-        let uri = "http://google.co.in".parse().unwrap();
+        let uri = "https://www.rust-lang.org/en-US/".parse().unwrap();
         let work = http_client.client.get(uri).map(|res|{
             assert_eq!(res.status(),hyper::StatusCode::Ok);
             println!("{}",res.status());
