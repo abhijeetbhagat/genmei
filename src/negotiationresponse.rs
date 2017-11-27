@@ -4,7 +4,8 @@ pub struct NegotiationResponse {
     pub url : String,
     #[serde (rename = "ConnectionToken")]
     connectionToken : String,
-    #[serde (rename = "ConnectionId")]connectionId : String,
+    #[serde (rename = "ConnectionId")]
+    connection_id : String,
     #[serde (rename = "KeepAliveTimeout")]
     keep_alive_timeout : i32,
     #[serde (rename = "DisconnectTimeout")]

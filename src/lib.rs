@@ -128,13 +128,9 @@ mod tests {
     }
 
     #[test]
-    fn test_http_client(){
+    fn test_httpclient_get() {
         let mut http_client = HttpClient::new();
-        let uri = "https://www.rust-lang.org/en-US/".parse().unwrap();
-        let work = http_client.client.get(uri).map(|res|{
-            assert_eq!(res.status(),hyper::StatusCode::Ok);
-            println!("{}",res.status());
-        });
-        http_client.core.run(work);
+        let uri = "http://localhost:8080/signalr/negotiate?clientProtocol=1.4&connectionData=[%7B%22Name%22:%22MyHub%22%7D]";
+        http_client.get(uri);
     }
 }
