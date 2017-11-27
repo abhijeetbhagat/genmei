@@ -5,18 +5,19 @@ use hyper::client::HttpConnector;
 use tokio_core::reactor::Core;
 
 pub struct HttpClient {
-    client : Client<HttpConnector>,
-    core : Core
+    pub client : Client<HttpConnector>,
+    pub core : Core
 }
 
 impl HttpClient {
-    fn new () -> Self {
-        unimplemented!()
-        //let mut core = Core::new()?;
-        //let client = Client::new (&core.handle());
-        //TODO abhi get the signalR uri here and use it
-        //let work = client.get ("https://localhost:8080/signalr/...");
-
+    pub fn new () -> Self {
+        let mut core = Core::new().unwrap();
+        let client = Client::new (&core.handle());
+        
+        HttpClient{
+            client : client,
+            core : core
+        }
     }
 
 }

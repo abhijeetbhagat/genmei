@@ -22,6 +22,7 @@ mod urlbuilder;
 mod version;
 mod negotiationresponse;
 
+
 #[cfg(test)]
 mod tests {
     use serde_json;
@@ -33,6 +34,10 @@ mod tests {
     use futures::future::Future;
     use version::Version;
     use negotiationresponse::NegotiationResponse;
+    use httpclient::HttpClient;
+    use hyper;
+
+
     //http://localhost:8080/signalr/negotiate?clientProtocol=1.4&connectionData=[%7B%22Name%22:%22MyHub%22%7D]
     /*{
         "Url": "/signalr",
@@ -120,5 +125,16 @@ mod tests {
         let n : NegotiationResponse = serde_json::from_str(j).unwrap();
         assert_eq! (n.url, "/signalr");
 
+
+
+    #[test]
+    fn test_http_client(){
+        let mut http_client = HttpClient::new();
+        let uri = "http://google.co.in".parse().unwrap();
+        let work = http_client.client.get(uri).map(|res|{
+            assert_eq!(res.status(),hyper::StatusCode::Ok);
+            println!("{}",res.status());
+        });
+        http_client.core.run(work);
     }
 }
