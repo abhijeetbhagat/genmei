@@ -125,7 +125,7 @@ mod tests {
         let n : NegotiationResponse = serde_json::from_str(j).unwrap();
         assert_eq! (n.url, "/signalr");
 
-
+    }
 
     #[test]
     fn test_http_client(){
