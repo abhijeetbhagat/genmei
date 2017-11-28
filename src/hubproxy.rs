@@ -16,14 +16,14 @@ use httpclient::HttpClient;
 }*/
 
 pub struct Proxy<'a> {
-    connection : &'a HubConnection,
+    connection : &'a Connection,
     hub_name : String,
     subscriptions : HashMap<String, Subscription>,
     pub http_client : HttpClient
 }
 
 impl<'a> Proxy<'a> {
-    pub fn new (connection : &'a HubConnection, name : String) -> Self {
+    pub fn new (connection : &'a Connection, name : String) -> Self {
         let url = connection.get_url().to_string();
         let hub_name = name;
         let hub_name1 = hub_name.clone();
@@ -68,7 +68,7 @@ impl<'a> Proxy<'a> {
             args : _args
         };
 
-        let data = self.connection.json_serialize_object (&message).unwrap();
+        let data = self.connection.json_serialize(&message);
         self.connection.send (data);
     }
 

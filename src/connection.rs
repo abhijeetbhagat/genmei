@@ -6,11 +6,14 @@ use serde_json;
 use serde_json::Result;
 use futures::future::FutureResult;
 use version::Version;
+use message::InvocationMessage;
 
 pub trait Connection {
     fn get_url(&self) -> &String;
     fn get_connection_token(&self) -> &String;
     fn get_protocol(&self) -> String;
+    fn json_serialize(&self, &InvocationMessage) -> String;
+    fn send (&self, data : String);
 }
 
 trait HubConnect {
@@ -45,10 +48,6 @@ impl HubConnection {
 
     pub fn create_hub_proxy (&self, hub_name : String) -> Proxy {
         Proxy::new (self, hub_name)
-    }
-
-    pub fn send(&self, data : String) {
-
     }
 
     pub fn start<T, E> (&self) -> FutureResult<T, E> {
@@ -99,6 +98,15 @@ impl Connection for HubConnection {
     fn get_connection_token (&self) -> &String {
         &self.connection_token
     }
+
+    fn json_serialize (&self, message : &InvocationMessage) -> String {
+        self.json_serialize_object (message).unwrap()
+    }
+
+    fn send(&self, data : String) {
+
+    }
+
 }
 
 impl HubConnect for HubConnection {
