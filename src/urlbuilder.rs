@@ -1,9 +1,9 @@
-use connection::HubConnection;
+use connection::Connection;
 
 pub struct UrlBuilder;
 
 impl UrlBuilder {
-    pub fn create_base_url<'a>(connection : &'a HubConnection, 
+    pub fn create_base_url<'a>(connection : &'a Connection, 
                                command : &str,
                                transport : &str,
                                connection_data : &str) -> String {
@@ -17,7 +17,7 @@ impl UrlBuilder {
         url 
     }
 
-    fn append_client_protocol (url : &mut String, connection : &HubConnection) {
+    fn append_client_protocol (url : &mut String, connection : &Connection) {
         url.push_str ("clientProtocol=");
         url.push_str (connection.get_protocol().as_str());
         url.push ('&');

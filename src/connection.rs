@@ -7,6 +7,12 @@ use serde_json::Result;
 use futures::future::FutureResult;
 use version::Version;
 
+pub trait Connection {
+    fn get_url(&self) -> &String;
+    fn get_connection_token(&self) -> &String;
+    fn get_protocol(&self) -> String;
+}
+
 trait HubConnect {
     fn register_callback (&mut self, fn(HubResult));
     fn remove_callback (&mut self, id : String);
@@ -79,15 +85,18 @@ impl HubConnection {
         self.on_statechanged = Some(handler);
     }
 
-    pub fn get_url (&self) -> &String {
+}
+
+impl Connection for HubConnection {
+    fn get_url (&self) -> &String {
         &self.url
     }
 
-    pub fn get_protocol (&self) -> String {
+    fn get_protocol (&self) -> String {
         self.protocol.to_string()
     }
 
-    pub fn get_connection_token (&self) -> &String {
+    fn get_connection_token (&self) -> &String {
         &self.connection_token
     }
 }

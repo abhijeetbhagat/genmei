@@ -1,7 +1,7 @@
 use std::any::Any;
 use futures::prelude::*;
 //use futures::future::Future;
-use connection::HubConnection;
+use connection::{Connection, HubConnection};
 use message::{Message, InvocationMessage};
 use serde_json::Value;
 use erased_serde::Serialize;
