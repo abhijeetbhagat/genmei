@@ -7,6 +7,7 @@ use serde_json::Value;
 use erased_serde::Serialize;
 use subscription::Subscription;
 use std::collections::HashMap;
+use httpclient::HttpClient;
 
 /* Due to E0038, we aren't using this trait
  * TODO abhi: need to revisit if necessary
@@ -17,15 +18,20 @@ use std::collections::HashMap;
 pub struct Proxy<'a> {
     connection : &'a HubConnection,
     hub_name : String,
-    subscriptions : HashMap<String, Subscription>
+    subscriptions : HashMap<String, Subscription>,
+    pub http_client : HttpClient
 }
 
 impl<'a> Proxy<'a> {
     pub fn new (connection : &'a HubConnection, name : String) -> Self {
+        let url = connection.get_url().to_string();
+        let hub_name = name;
+        let hub_name1 = hub_name.clone();
         Proxy {
             connection : connection,
-            hub_name : name,
-            subscriptions : HashMap::new()
+            hub_name : hub_name,
+            subscriptions : HashMap::new(),
+            http_client : HttpClient::new(url,hub_name1)
         }
     }
 

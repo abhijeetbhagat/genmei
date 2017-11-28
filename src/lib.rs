@@ -59,6 +59,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_connection_create() {
         let connection = HubConnectionBuilder::new (String::from("http://localhost:8080"))
                             .use_default_url (false)
@@ -68,6 +69,24 @@ mod tests {
         proxy.on::<String> (String::from ("addMessage"), Box::new (|s| {}));
         proxy.invoke (String::from ("addMessage"), vec![&String::from ("abhi"), &1]);
         connection.start::<(), ()>().wait();
+    }
+
+    #[test]
+    fn test_http_client_with_proxy(){
+        let connection = HubConnectionBuilder::new (String::from("http://localhost:8080/signalr"))
+            .use_default_url (false)
+            .finish();
+        let mut proxy = connection.create_hub_proxy (String::from ("MyHub"));
+        //proxy.http_client; 
+        //let uri = "https://www.rust-lang.org/en-US/".parse().unwrap();
+        //let work = proxy.http_client.client.get(uri).map(|res|{
+        //    assert_eq!(res.status(),hyper::StatusCode::Ok);
+        //    println!("{}",res.status());
+        //});
+        //proxy.http_client.core.run(work);
+        proxy.http_client.create_negotiate_request();
+
+
     }
 
     #[test]
