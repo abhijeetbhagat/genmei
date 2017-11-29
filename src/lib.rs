@@ -59,7 +59,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_connection_create() {
         let connection = HubConnectionBuilder::new (String::from("http://localhost:8080"))
                             .use_default_url (false)
@@ -72,6 +71,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_http_client_with_proxy(){
         let connection = HubConnectionBuilder::new (String::from("http://localhost:8080/signalr"))
             .use_default_url (false)
@@ -147,9 +147,11 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_httpclient_get() {
-        let mut http_client = HttpClient::new();
+        /*let mut http_client = HttpClient::new();
         let uri = "http://localhost:8080/signalr/negotiate?clientProtocol=1.4&connectionData=[%7B%22Name%22:%22MyHub%22%7D]";
         http_client.get(uri);
+        */
     }
 }

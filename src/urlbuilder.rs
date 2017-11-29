@@ -41,4 +41,9 @@ impl UrlBuilder {
         url.push ('&');
 
     }
+
+    fn create_negotiate_url (connection : &Connection, connection_data : &str) -> String {
+        let url = format!("{}/negotiate?clientProtocol={}&connectionData=[%7B%22name%22:%22{}%22%7D]", connection.get_url(), connection.get_protocol(), connection_data);
+        url
+    }
 }

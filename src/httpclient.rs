@@ -41,20 +41,6 @@ impl HttpClient {
         });
         self.core.run(work).unwrap();
     } 
-
-    pub fn create_negotiate_request(&mut self){
-       let conn_name = &self.hub_name;
-       println!("urlk :: {}",self.url); 
-       let url1 = format!("{}/negotiate?clientProtocol={}&connectionData=[%7B%22name%22:%22{}%22%7D]", self.url, 1.4, conn_name).parse().unwrap();
-      
-       println!("doing get request {}",url1);
-       let work = self.client.get(url1).map(|res|{
-           println!("negotiation status {}",res.status());
-          // println!("body : {:?}",res.body());
-           assert_eq!(res.status(),hyper::StatusCode::Ok);
-       });
-       self.core.run(work);
-    }
 }
 
 impl HttpBasedTransport for HttpClient {
