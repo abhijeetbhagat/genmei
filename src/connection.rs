@@ -7,12 +7,15 @@ use serde_json::Result;
 use futures::future::FutureResult;
 use version::Version;
 use message::InvocationMessage;
+use clienttransport::ClientTransport;
+use std::ops::Deref;
 
 pub trait Connection {
     fn get_url(&self) -> &String;
     fn get_connection_token(&self) -> &String;
     fn get_protocol(&self) -> String;
     fn json_serialize(&self, &InvocationMessage) -> String;
+    fn get_transport(&self) -> &ClientTransport;
     fn send (&self, data : String);
 }
 
@@ -35,7 +38,8 @@ pub struct HubConnection {
     on_reconnected : Option<Box<Fn(String)>>,
     on_statechanged : Option<Box<Fn(String)>>,
     protocol : Version,
-    connection_token : String
+    connection_token : String,
+    client_transport : Option<Box<ClientTransport>>
 }
 
 impl HubConnection {
@@ -53,7 +57,6 @@ impl HubConnection {
     pub fn start<T, E> (&self) -> FutureResult<T, E> {
         //TODO abhi initiate a connection to the server here
         unimplemented!();
-
     }
 
     pub fn json_serialize_object<T : Serialize> (&self, object : &T) -> Result<String> {
@@ -105,6 +108,10 @@ impl Connection for HubConnection {
 
     fn send(&self, data : String) {
 
+    }
+
+    fn get_transport(&self) -> &ClientTransport {
+        self.client_transport.as_ref().unwrap().deref()
     }
 
 }
@@ -168,7 +175,8 @@ impl HubConnectionBuilder {
             on_reconnected : None,
             on_statechanged : None,
             protocol : Version::new (1, 4), //TODO abhi: should this be read from a config file?
-            connection_token : String::new()
+            connection_token : String::new(),
+            client_transport : None
         }
     }
 }

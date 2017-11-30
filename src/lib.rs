@@ -21,7 +21,7 @@ mod subscription;
 mod urlbuilder;
 mod version;
 mod negotiationresponse;
-
+mod clienttransport; 
 
 #[cfg(test)]
 mod tests {
