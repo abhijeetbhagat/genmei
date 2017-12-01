@@ -19,7 +19,6 @@ pub struct Proxy<'a> {
     connection : &'a Connection,
     hub_name : String,
     subscriptions : HashMap<String, Subscription>,
-    pub http_client : HttpClient
 }
 
 impl<'a> Proxy<'a> {
@@ -31,7 +30,6 @@ impl<'a> Proxy<'a> {
             connection : connection,
             hub_name : hub_name,
             subscriptions : HashMap::new(),
-            http_client : HttpClient::new(url,hub_name1)
         }
     }
 

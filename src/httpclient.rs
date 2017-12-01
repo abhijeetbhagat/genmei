@@ -1,7 +1,7 @@
 extern crate tokio_core;
 extern crate hyper;
 use httpbasedtransport::HttpBasedTransport;
-use hyper::Client;
+use hyper::{Response, Client};
 use hyper::client::{HttpConnector, FutureResponse};
 use tokio_core::reactor::Core;
 use futures::{Future, Stream};
@@ -10,19 +10,24 @@ use connection::HubConnection;
 use std::any::Any;
 use futures::prelude::*;
 
-pub struct HttpClient {
+pub trait HttpClient {
+    fn get(&self) -> Response;
+    fn post(&self) -> Response;
+}
+
+pub struct DefaultHttpClient {
     pub client : Client<HttpConnector>,
     pub core : Core,
     url : String,
     hub_name : String
 }
 
-impl HttpClient {
+impl DefaultHttpClient {
     pub fn new (url: String,hub_name : String) -> Self {
         let mut core = Core::new().unwrap();
         let client = Client::new (&core.handle());
         
-        HttpClient{
+        DefaultHttpClient{
             client : client,
             core : core,
             url : url,
@@ -43,8 +48,12 @@ impl HttpClient {
     } 
 }
 
-impl HttpBasedTransport for HttpClient {
-    fn init () {
+impl HttpClient for DefaultHttpClient {
+    fn get (&self) -> Response {
+        unimplemented!(); 
+    } 
 
+    fn post (&self) -> Response {
+        unimplemented!(); 
     } 
 }
