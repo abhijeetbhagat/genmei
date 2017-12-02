@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use serde::ser::Serialize;
 use serde_json;
 use serde_json::Result;
+use futures::future;
 use futures::future::Future;
 use version::Version;
 use message::InvocationMessage;
@@ -17,7 +18,7 @@ pub trait Connection {
     fn json_serialize(&self, &InvocationMessage) -> String;
     fn get_transport(&self) -> &ClientTransport;
     fn send (&self, data : String);
-    fn start (&self) -> &Future<Item=(), Error=()>;
+    fn start (&self) -> Box<Future<Item=(), Error=()>>;
 }
 
 trait HubConnect {
@@ -115,9 +116,14 @@ impl Connection for HubConnection {
         self.client_transport.as_ref().unwrap().deref()
     }
 
-    fn start (&self) -> &Future<Item=(), Error=()> {
+    fn start (&self) -> Box<Future<Item=(), Error=()>> {
         unimplemented!();
+        Box::new(self.client_transport.as_ref().unwrap().negotiate().map(|response|{
+            ()
+        })) 
     }
+    
+    //fn negotiate
 
 }
 
