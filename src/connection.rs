@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use serde::ser::Serialize;
 use serde_json;
 use serde_json::Result;
-use futures::future::FutureResult;
+use futures::future::Future;
 use version::Version;
 use message::InvocationMessage;
 use clienttransport::ClientTransport;
@@ -17,6 +17,7 @@ pub trait Connection {
     fn json_serialize(&self, &InvocationMessage) -> String;
     fn get_transport(&self) -> &ClientTransport;
     fn send (&self, data : String);
+    fn start (&self) -> &Future<Item=(), Error=()>;
 }
 
 trait HubConnect {
@@ -54,10 +55,10 @@ impl HubConnection {
         Proxy::new (self, hub_name)
     }
 
-    pub fn start<T, E> (&self) -> FutureResult<T, E> {
+    /*pub fn start<T, E> (&self) -> FutureResult<T, E> {
         //TODO abhi initiate a connection to the server here
         unimplemented!();
-    }
+    }*/
 
     pub fn json_serialize_object<T : Serialize> (&self, object : &T) -> Result<String> {
         serde_json::to_string (object)
@@ -112,6 +113,10 @@ impl Connection for HubConnection {
 
     fn get_transport(&self) -> &ClientTransport {
         self.client_transport.as_ref().unwrap().deref()
+    }
+
+    fn start (&self) -> &Future<Item=(), Error=()> {
+        unimplemented!();
     }
 
 }
