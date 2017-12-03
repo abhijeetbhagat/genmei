@@ -11,31 +11,30 @@ use std::any::Any;
 use futures::prelude::*;
 
 pub trait HttpClient {
-    fn get(&self) -> Response;
+    fn get(&mut self, url : &str) -> Response;
     fn post(&self) -> Response;
 }
 
 pub struct DefaultHttpClient {
     pub client : Client<HttpConnector>,
-    pub core : Core,
-    url : String,
-    hub_name : String
+    pub core : Core
 }
 
 impl DefaultHttpClient {
-    pub fn new (url: String,hub_name : String) -> Self {
+    pub fn new () -> Self {
         let mut core = Core::new().unwrap();
         let client = Client::new (&core.handle());
         
         DefaultHttpClient{
             client : client,
-            core : core,
-            url : url,
-            hub_name : hub_name
+            core : core
         }
     }
+}
 
-    pub fn get (&mut self, url : &str) {
+impl HttpClient for DefaultHttpClient {
+    fn get (&mut self, url : &str) -> Response {
+        unimplemented!(); 
         let work = self.client.get (url.parse().unwrap()).and_then(|res| {
             res.body().for_each(|chunk| {
                 io::stdout()
@@ -45,12 +44,6 @@ impl DefaultHttpClient {
             })
         });
         self.core.run(work).unwrap();
-    } 
-}
-
-impl HttpClient for DefaultHttpClient {
-    fn get (&self) -> Response {
-        unimplemented!(); 
     } 
 
     fn post (&self) -> Response {
