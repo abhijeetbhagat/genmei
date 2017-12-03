@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use serde::ser::Serialize;
 use serde_json;
 use serde_json::Result;
-use futures::future;
+use futures::future::*;
 use futures::future::Future;
 use version::Version;
 use message::InvocationMessage;
@@ -18,7 +18,7 @@ pub trait Connection {
     fn json_serialize(&self, &InvocationMessage) -> String;
     fn get_transport(&self) -> &ClientTransport;
     fn send (&self, data : String);
-    fn start (&self) -> Box<Future<Item=(), Error=()>>;
+    fn start (&mut self) -> Box<Future<Item=(), Error=()>>;
 }
 
 trait HubConnect {
@@ -32,6 +32,9 @@ pub struct HubConnection {
     query_string : String,
     query_string_map : HashMap<String, String>,
     callbacks_map : HashMap<String, fn(HubResult)>,
+    //proxies_map : HashMap<String, Proxy>,
+    //TODO abhi: remove this field after proxies_map is used
+    hub_name : String,
     pub headers : HashMap<String, String>,
     on_received : Option<Box<Fn(String)>>,
     on_closed : Option<Box<Fn(String)>>,
@@ -41,6 +44,7 @@ pub struct HubConnection {
     on_statechanged : Option<Box<Fn(String)>>,
     protocol : Version,
     connection_token : String,
+    connection_id : String,
     client_transport : Option<Box<ClientTransport>>
 }
 
@@ -52,7 +56,8 @@ impl HubConnection {
         }
     }*/
 
-    pub fn create_hub_proxy (&self, hub_name : String) -> Proxy {
+    pub fn create_hub_proxy (&mut self, hub_name : String) -> Proxy {
+        self.hub_name = hub_name.clone();
         Proxy::new (self, hub_name)
     }
 
@@ -89,6 +94,9 @@ impl HubConnection {
         self.on_statechanged = Some(handler);
     }
 
+    fn start_transport(&self) {
+        self.client_transport.as_mut().unwrap().start(self.hub_name.clone()); 
+    } 
 }
 
 impl Connection for HubConnection {
@@ -116,11 +124,19 @@ impl Connection for HubConnection {
         self.client_transport.as_ref().unwrap().deref()
     }
 
-    fn start (&self) -> Box<Future<Item=(), Error=()>> {
+    fn start (&mut self) -> Box<Future<Item=(), Error=()>> {
         unimplemented!();
-        Box::new(self.client_transport.as_ref().unwrap().negotiate().map(|response|{
+        self.client_transport.as_mut().unwrap().
+        negotiate().map(|r|{
+            self.connection_token = r.connection_token;
+            self.connection_id = r.connection_id;
+            self.start_transport()
+        });
+        Box::new(result(Ok(())))
+        /*Box::new(self.client_transport.as_mut().unwrap().negotiate().map(|response|{
+            self.connection_token = response.connection_token;
             ()
-        })) 
+        })) */
     }
     
     //fn negotiate
@@ -178,6 +194,7 @@ impl HubConnectionBuilder {
             query_string : self.query_string.unwrap_or (String::from ("")),
             query_string_map : self.query_string_map.unwrap_or ( HashMap::new()),
             callbacks_map : HashMap::new(),
+            hub_name : String::new(),
             headers : HashMap::new(),
             on_received : None,
             on_closed : None,
@@ -187,6 +204,7 @@ impl HubConnectionBuilder {
             on_statechanged : None,
             protocol : Version::new (1, 4), //TODO abhi: should this be read from a config file?
             connection_token : String::new(),
+            connection_id : String::new(),
             client_transport : None
         }
     }
