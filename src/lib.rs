@@ -28,13 +28,13 @@ mod tests {
     use serde_json;
     use message;
     use message::{InvocationMessage};
-    use connection::{HubConnection, HubConnectionBuilder};
+    use connection::{Connection, HubConnection, HubConnectionBuilder};
     use hubproxy::Proxy;
     use std::mem;
     use futures::future::Future;
     use version::Version;
     use negotiationresponse::NegotiationResponse;
-    use httpclient::HttpClient;
+    use httpclient::{HttpClient, DefaultHttpClient};
     use hyper;
 
 
@@ -60,20 +60,21 @@ mod tests {
 
     #[test]
     fn test_connection_create() {
-        let connection = HubConnectionBuilder::new (String::from("http://localhost:8080"))
+        let mut connection = HubConnectionBuilder::new (String::from("http://localhost:8080"))
                             .use_default_url (false)
                             .finish();
-        let mut proxy = connection.create_hub_proxy (String::from ("MyHub"));
 
+        let mut proxy = connection.create_hub_proxy (String::from ("MyHub")); 
         proxy.on::<String> (String::from ("addMessage"), Box::new (|s| {}));
         proxy.invoke (String::from ("addMessage"), vec![&String::from ("abhi"), &1]);
-        connection.start::<(), ()>().wait();
+
+        connection.start().wait();
     }
 
     #[test]
     #[ignore]
     fn test_http_client_with_proxy(){
-        let connection = HubConnectionBuilder::new (String::from("http://localhost:8080/signalr"))
+        let mut connection = HubConnectionBuilder::new (String::from("http://localhost:8080/signalr"))
             .use_default_url (false)
             .finish();
         let mut proxy = connection.create_hub_proxy (String::from ("MyHub"));
@@ -84,7 +85,7 @@ mod tests {
         //    println!("{}",res.status());
         //});
         //proxy.http_client.core.run(work);
-        proxy.http_client.create_negotiate_request();
+        //proxy.http_client.create_negotiate_request();
 
 
     }
@@ -149,7 +150,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_httpclient_get() {
-        let mut http_client = HttpClient::new();
+        let mut http_client = DefaultHttpClient::new();
         let uri = "http://localhost:8080/signalr/negotiate?clientProtocol=1.4&connectionData=[%7B%22Name%22:%22MyHub%22%7D]";
         http_client.get(uri);
         
