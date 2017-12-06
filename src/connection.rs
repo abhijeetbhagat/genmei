@@ -58,7 +58,7 @@ impl HubConnection {
 
     pub fn create_hub_proxy (&mut self, hub_name : String) -> Proxy {
         self.hub_name = hub_name.clone();
-        Proxy::new (self, hub_name)
+        Proxy::new (/*self,*/ hub_name)
     }
 
     /*pub fn start<T, E> (&self) -> FutureResult<T, E> {

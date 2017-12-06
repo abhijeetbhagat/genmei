@@ -15,19 +15,19 @@ use httpclient::HttpClient;
     fn invoke<T, E> (&self, method : String) -> FutureResult<T, E>;
 }*/
 
-pub struct Proxy<'a> {
-    connection : &'a Connection,
+pub struct Proxy {
+    //connection : &'a Connection,
     hub_name : String,
     subscriptions : HashMap<String, Subscription>,
 }
 
-impl<'a> Proxy<'a> {
-    pub fn new (connection : &'a Connection, name : String) -> Self {
-        let url = connection.get_url().to_string();
+impl Proxy {
+    pub fn new (/*connection : &Connection,*/ name : String) -> Self {
+        //let url = connection.get_url().to_string();
         let hub_name = name;
         let hub_name1 = hub_name.clone();
         Proxy {
-            connection : connection,
+            //connection : connection,
             hub_name : hub_name,
             subscriptions : HashMap::new(),
         }
@@ -51,7 +51,7 @@ impl<'a> Proxy<'a> {
 
     pub fn invoke (&self,
                    method : String,
-                   args : Vec<&Serialize>) -> Box<Future<Item=(), Error=()>> {
+                   args : Vec<&Serialize>) /*-> Box<Future<Item=(), Error=()>>*/ {
         //TODO abhi : remove macro after implementation
         unimplemented!();
         let mut _args = vec![];
@@ -66,8 +66,8 @@ impl<'a> Proxy<'a> {
             args : _args
         };
 
-        let data = self.connection.json_serialize(&message);
-        self.connection.send (data);
+        //let data = self.connection.json_serialize(&message);
+        //self.connection.send (data);
     }
 
     pub fn subscribe (&mut self, event : String) -> &mut Subscription {
