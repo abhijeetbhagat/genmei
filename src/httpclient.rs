@@ -1,17 +1,18 @@
 extern crate tokio_core;
 extern crate hyper;
 use httpbasedtransport::HttpBasedTransport;
-use hyper::{Response, Client};
+use hyper::{Response, Client, Error};
 use hyper::client::{HttpConnector, FutureResponse};
 use tokio_core::reactor::Core;
 use futures::{Future, Stream};
+use futures::future;
 use std::io::{self, Write};
 use connection::HubConnection;
 use std::any::Any;
 use futures::prelude::*;
 
 pub trait HttpClient {
-    fn get(&mut self, url : &str) -> Response;
+    fn get(&mut self, url : &str) -> String;
     fn post(&self) -> Response;
 }
 
@@ -33,17 +34,19 @@ impl DefaultHttpClient {
 }
 
 impl HttpClient for DefaultHttpClient {
-    fn get (&mut self, url : &str) -> Response {
-        unimplemented!(); 
+    fn get (&mut self, url : &str) -> String {
+        //unimplemented!(); 
         let work = self.client.get (url.parse().unwrap()).and_then(|res| {
-            res.body().for_each(|chunk| {
-                io::stdout()
-                .write_all(&chunk)
-                .map(|_| ())
-                .map_err(From::from)
+            res.body().fold(Vec::new(), |mut v, chunk| {
+                v.extend(&chunk[..]);
+                future::ok::<_, Error>(v)
+            }).and_then(|v|{
+                let s = String::from_utf8(v).unwrap();
+                future::ok::<_, Error>(s)
             })
         });
-        self.core.run(work).unwrap();
+        //TODO abhi: work should not be run here
+        self.core.run(work).unwrap()
     } 
 
     fn post (&self) -> Response {

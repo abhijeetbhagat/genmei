@@ -94,7 +94,7 @@ impl HubConnection {
         self.on_statechanged = Some(handler);
     }
 
-    fn start_transport(&self) {
+    fn start_transport(&mut self) {
         self.client_transport.as_mut().unwrap().start(self.hub_name.clone()); 
     } 
 }
