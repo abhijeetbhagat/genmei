@@ -22,6 +22,7 @@ mod urlbuilder;
 mod version;
 mod negotiationresponse;
 mod clienttransport; 
+mod autotransport;
 
 #[cfg(test)]
 mod tests {
