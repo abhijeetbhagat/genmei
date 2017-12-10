@@ -12,7 +12,7 @@ use clienttransport::ClientTransport;
 use std::ops::Deref;
 
 pub trait Connection {
-    fn get_url(&self) -> &String;
+    fn get_url(&self) -> String;
     fn get_connection_token(&self) -> &String;
     fn get_protocol(&self) -> String;
     fn json_serialize(&self, &InvocationMessage) -> String;
@@ -95,13 +95,14 @@ impl HubConnection {
     }
 
     fn start_transport(&mut self) {
-        self.client_transport.as_mut().unwrap().start(self.hub_name.clone()); 
+        let c = self.client_transport.as_mut().unwrap();
+        c.start(); 
     } 
 }
 
 impl Connection for HubConnection {
-    fn get_url (&self) -> &String {
-        &self.url
+    fn get_url (&self) -> String {
+        self.url.clone()
     }
 
     fn get_protocol (&self) -> String {
@@ -126,8 +127,9 @@ impl Connection for HubConnection {
 
     fn start (&mut self) -> Box<Future<Item=(), Error=()>> {
         unimplemented!();
-        self.client_transport.as_mut().unwrap().
-        negotiate().map(|r|{
+        let url = self.get_url();
+        let protocol = self.get_protocol();
+        self.client_transport.as_mut().unwrap().negotiate(url.as_str(), "", protocol.as_str()).map(|r|{
             self.connection_token = r.connection_token;
             self.connection_id = r.connection_id;
             self.start_transport()

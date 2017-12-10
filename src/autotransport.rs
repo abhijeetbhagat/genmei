@@ -18,13 +18,13 @@ impl AutoTransport {
 }
 
 impl ClientTransport for AutoTransport {
-    fn negotiate(&mut self, conn : &Connection, connection_data : String) -> Box<Future<Item=NegotiationResponse, Error=()>> {
+    fn negotiate(&mut self, url : &str, connection_data : &str, protocol : &str) -> Box<Future<Item=NegotiationResponse, Error=()>> {
         unimplemented!();
-        let url = UrlBuilder::create_base_url(conn, "negotiate", None, connection_data.as_str());
+        let url = UrlBuilder::create_negotiate_url(url, connection_data, protocol);
         let response = self.http_client.get(url.as_str());
     }
 
-    fn start(&self, conn : &Connection) -> Box<Future<Item=(), Error=()>> {
+    fn start(&self) -> Box<Future<Item=(), Error=()>> {
 
         unimplemented!();
     }
