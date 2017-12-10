@@ -14,6 +14,7 @@ use std::ops::Deref;
 pub trait Connection {
     fn get_url(&self) -> String;
     fn get_connection_token(&self) -> &String;
+    fn get_connection_data(&self) -> String;
     fn get_protocol(&self) -> String;
     fn json_serialize(&self, &InvocationMessage) -> String;
     fn get_transport(&self) -> &ClientTransport;
@@ -113,6 +114,13 @@ impl Connection for HubConnection {
         &self.connection_token
     }
 
+    fn get_connection_data(&self) -> String {
+        //TODO abhi use this line when proxies_map is used
+        //For now, just use the hub_name
+        //String::from(self.proxies_map.keys().take(1).next().unwrap()) 
+        format!("[%7B%22Name%22:%22{}%22%7D]", self.hub_name.clone())
+    }
+
     fn json_serialize (&self, message : &InvocationMessage) -> String {
         self.json_serialize_object (message).unwrap()
     }
@@ -129,7 +137,8 @@ impl Connection for HubConnection {
         unimplemented!();
         let url = self.get_url();
         let protocol = self.get_protocol();
-        self.client_transport.as_mut().unwrap().negotiate(url.as_str(), "", protocol.as_str()).map(|r|{
+        let connection_data = self.get_connection_data();
+        self.client_transport.as_mut().unwrap().negotiate(url.as_str(), connection_data.as_str(), protocol.as_str()).map(|r|{
             self.connection_token = r.connection_token;
             self.connection_id = r.connection_id;
             self.start_transport()
