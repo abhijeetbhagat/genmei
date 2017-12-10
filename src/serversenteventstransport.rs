@@ -1,6 +1,2 @@
-struct ServerSentEventsTransport;
-
-impl HttpBasedTransport for ServerSentEventsTransport {
-
-}
+pub struct ServerSentEventsTransport;
 

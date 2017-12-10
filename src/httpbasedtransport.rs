@@ -1,3 +1,3 @@
 pub trait HttpBasedTransport {
-    fn init ();
+    fn init();
 }

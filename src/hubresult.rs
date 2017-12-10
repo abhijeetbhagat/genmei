@@ -1,9 +1,7 @@
-pub struct HubResult {
-
-}
+pub struct HubResult {}
 
 impl HubResult {
-    fn new () -> Self {
+    fn new() -> Self {
         HubResult {}
     }
 }
