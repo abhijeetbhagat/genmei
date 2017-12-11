@@ -15,8 +15,6 @@ impl ClientTransport for LongPollingTransport {
         protocol: &str,
     ) -> Box<Future<Item = NegotiationResponse, Error = ()>> {
         unimplemented!();
-        let url = UrlBuilder::create_negotiate_url(url, connection_data, protocol);
-        let response = self.http_client.get(url.as_str());
     }
 
     fn start(
