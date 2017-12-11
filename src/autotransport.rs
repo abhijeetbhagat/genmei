@@ -18,8 +18,15 @@ impl AutoTransport {
     pub fn new(http_client: Box<HttpClient>) -> Self {
         AutoTransport {
             http_client: http_client,
-            transports: vec![ServerSentEventsTransport, LongPollingTransport],
+            transports: vec![Box::new(ServerSentEventsTransport), Box::new(LongPollingTransport)],
         }
+    }
+
+    fn resolve_transport(&self, i : usize) -> Box<Future<Item = (), Error = ()>> {
+        unimplemented!();
+        let transport = &self.transports[i];
+        i = i + 1;
+        self.resolve_transport(i)
     }
 }
 
@@ -44,15 +51,17 @@ impl ClientTransport for AutoTransport {
     ) -> Box<Future<Item = (), Error = ()>> {
         unimplemented!();
         //TODO abhi: iterate over all the transports until a connection is made
-        let url = UrlBuilder::create_connect_url(
+        /*let url = UrlBuilder::create_connect_url(
             url,
             Some("auto"),
             connection_data,
-            connection_token,
+            Some(connection_token),
             protocol
         ); 
-        let response = self.http_client.get(url.as_str());
+        let response = self.http_client.get(url.as_str());*/
+        self.resolve_transport(0)
     }
+
 
     fn send(&self) -> Box<Future<Item = (), Error = ()>> {
         unimplemented!();
