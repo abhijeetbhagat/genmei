@@ -100,14 +100,12 @@ impl HubConnection {
         let protocol = self.get_protocol();
         let connection_data = self.get_connection_data();
         let connection_token = self.get_connection_token();
-        self.client_transport
-            .as_mut()
-            .unwrap()
-            .start(
-                  url.as_str(),
-                  connection_data.as_str(),
-                  connection_token.as_str(),
-                  protocol.as_str());
+        self.client_transport.as_mut().unwrap().start(
+            url.as_str(),
+            connection_data.as_str(),
+            connection_token.as_str(),
+            protocol.as_str(),
+        );
     }
 }
 

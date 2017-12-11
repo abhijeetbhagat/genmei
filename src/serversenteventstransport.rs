@@ -36,4 +36,3 @@ impl ClientTransport for ServerSentEventsTransport {
         unimplemented!();
     }
 }
-

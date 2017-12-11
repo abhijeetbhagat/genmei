@@ -22,7 +22,7 @@ impl ClientTransport for LongPollingTransport {
         url: &str,
         connection_data: &str,
         connection_token: &str,
-        protocol: &str
+        protocol: &str,
     ) -> Box<Future<Item = (), Error = ()>> {
         unimplemented!();
         //let url = UrlBuilder::create_connect_url(url, conn)
