@@ -1,7 +1,7 @@
 use clienttransport::ClientTransport;
 use futures::future::{ok, Future};
 use negotiationresponse::NegotiationResponse;
-use httpclient::{HttpClient, DefaultHttpClient};
+use httpclient::HttpClient;
 use urlbuilder::UrlBuilder;
 use connection::Connection;
 use serversenteventstransport::ServerSentEventsTransport;
