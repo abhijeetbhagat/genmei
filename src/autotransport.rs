@@ -1,7 +1,7 @@
 use clienttransport::ClientTransport;
 use futures::future::{ok, Future};
 use negotiationresponse::NegotiationResponse;
-use httpclient::HttpClient;
+use httpclient::{HttpClient, DefaultHttpClient};
 use urlbuilder::UrlBuilder;
 use connection::Connection;
 use serversenteventstransport::ServerSentEventsTransport;
@@ -20,7 +20,7 @@ impl AutoTransport {
         AutoTransport {
             http_client: http_client,
             transports: vec![
-                Box::new(ServerSentEventsTransport),
+                Box::new(ServerSentEventsTransport::new()),
                 Box::new(LongPollingTransport),
             ],
         }
@@ -50,6 +50,7 @@ impl ClientTransport for AutoTransport {
         protocol: &str,
     ) -> Box<Future<Item = NegotiationResponse, Error = ()>> {
         let url = UrlBuilder::create_negotiate_url(url, connection_data, protocol);
+        //TODO abhi: get should return a future; so process accordingly
         let response = self.http_client.get(url.as_str());
         let response = serde_json::from_str(&response).unwrap();
         Box::new(ok::<_, _>(response))

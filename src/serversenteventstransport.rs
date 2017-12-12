@@ -1,11 +1,25 @@
 use clienttransport::ClientTransport;
-use futures::future::Future;
+use futures::future::{Future, ok};
 use negotiationresponse::NegotiationResponse;
-use httpclient::HttpClient;
+use httpclient::{HttpClient, DefaultHttpClient};
 use urlbuilder::UrlBuilder;
 use connection::Connection;
 
-pub struct ServerSentEventsTransport;
+pub struct ServerSentEventsTransport {
+    http_client : Box<HttpClient>
+}
+
+impl ServerSentEventsTransport {
+    pub fn new () -> Self {
+        ServerSentEventsTransport {
+            http_client : Box::new(DefaultHttpClient::new())
+        }
+    }
+
+    fn open_connection(&self, url : &str, connection_data : &str, connection_token : &str, protocol : &str) {
+        let url = UrlBuilder::create_connect_url(url, Some("serversentevent"), connection_data, Some(connection_token), protocol);
+    }
+}
 
 impl ClientTransport for ServerSentEventsTransport {
     fn negotiate(
@@ -25,6 +39,9 @@ impl ClientTransport for ServerSentEventsTransport {
         protocol: &str,
     ) -> Box<Future<Item = (), Error = ()>> {
         unimplemented!();
+        self.open_connection(url, connection_data, connection_token, protocol);
+        Box::new(ok::<_,_>(()))
+
     }
 
 
