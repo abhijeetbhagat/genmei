@@ -4,6 +4,8 @@ use negotiationresponse::NegotiationResponse;
 use httpclient::{HttpClient, DefaultHttpClient};
 use urlbuilder::UrlBuilder;
 use connection::Connection;
+use serde_json;
+use serde_json::{Map, Value};
 
 pub struct ServerSentEventsTransport {
     http_client : Box<HttpClient>
@@ -16,8 +18,15 @@ impl ServerSentEventsTransport {
         }
     }
 
-    fn open_connection(&self, url : &str, connection_data : &str, connection_token : &str, protocol : &str) {
+    fn open_connection(&mut self, url : &str, connection_data : &str, connection_token : &str, protocol : &str) {
         let url = UrlBuilder::create_connect_url(url, Some("serversentevent"), connection_data, Some(connection_token), protocol);
+        let response = self.http_client.get(url.as_str());
+        ServerSentEventsTransport::process_response(response);
+    }
+
+    fn process_response(response : String) {
+        let map : Map<String, Value> = serde_json::from_str(&response).unwrap();
+
     }
 }
 
@@ -32,7 +41,7 @@ impl ClientTransport for ServerSentEventsTransport {
     }
 
     fn start(
-        &self,
+        &mut self,
         url: &str,
         connection_data: &str,
         connection_token: &str,

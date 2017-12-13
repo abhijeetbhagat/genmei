@@ -27,7 +27,7 @@ impl AutoTransport {
     }
 
     fn resolve_transport(
-        &self,
+        &mut self,
         url: &str,
         connection_data: &str,
         connection_token: &str,
@@ -35,10 +35,11 @@ impl AutoTransport {
         i: usize,
     ) -> Box<Future<Item = (), Error = ()>> {
         unimplemented!();
-        let transport = &self.transports[i];
-        transport.start(url, connection_data, connection_token, protocol);
-        i = i + 1;
-        self.resolve_transport(url, connection_data, connection_token, protocol, i)
+        {
+            let transport = &mut self.transports[i];
+            transport.start(url, connection_data, connection_token, protocol);
+        }
+        self.resolve_transport(url, connection_data, connection_token, protocol, i + 1)
     }
 }
 
@@ -57,7 +58,7 @@ impl ClientTransport for AutoTransport {
     }
 
     fn start(
-        &self,
+        &mut self,
         url: &str,
         connection_data: &str,
         connection_token: &str,

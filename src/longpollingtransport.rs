@@ -18,7 +18,7 @@ impl ClientTransport for LongPollingTransport {
     }
 
     fn start(
-        &self,
+        &mut self,
         url: &str,
         connection_data: &str,
         connection_token: &str,

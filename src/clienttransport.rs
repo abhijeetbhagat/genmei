@@ -10,7 +10,7 @@ pub trait ClientTransport {
         protocol: &str,
     ) -> Box<Future<Item = NegotiationResponse, Error = ()>>;
     fn start(
-        &self,
+        &mut self,
         url: &str,
         connection_data: &str,
         connection_token: &str,
