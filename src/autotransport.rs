@@ -7,6 +7,7 @@ use connection::Connection;
 use serversenteventstransport::ServerSentEventsTransport;
 use longpollingtransport::LongPollingTransport;
 use serde_json;
+use serde_json::{Map, Value};
 
 type TransportList = Vec<Box<ClientTransport>>;
 
@@ -33,11 +34,14 @@ impl AutoTransport {
         connection_token: &str,
         protocol: &str,
         i: usize,
-    ) -> Box<Future<Item = (), Error = ()>> {
+    ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
         unimplemented!();
         {
-            let transport = &mut self.transports[i];
-            transport.start(url, connection_data, connection_token, protocol);
+            if i < self.transports.len() {
+                let transport = &mut self.transports[i];
+                //TODO abhi: check error returned from start() and try another transport
+                return transport.start(url, connection_data, connection_token, protocol);
+            }
         }
         self.resolve_transport(url, connection_data, connection_token, protocol, i + 1)
     }
@@ -63,7 +67,7 @@ impl ClientTransport for AutoTransport {
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
-    ) -> Box<Future<Item = (), Error = ()>> {
+    ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
         self.resolve_transport(url, connection_data, connection_token, protocol, 0)
     }
 

@@ -18,15 +18,15 @@ impl ServerSentEventsTransport {
         }
     }
 
-    fn open_connection(&mut self, url : &str, connection_data : &str, connection_token : &str, protocol : &str) {
+    fn open_connection(&mut self, url : &str, connection_data : &str, connection_token : &str, protocol : &str, map : &mut Map<String, Value>) {
         let url = UrlBuilder::create_connect_url(url, Some("serversentevent"), connection_data, Some(connection_token), protocol);
         let response = self.http_client.get(url.as_str());
-        ServerSentEventsTransport::process_response(response);
+        ServerSentEventsTransport::process_response(response)
     }
 
     fn process_response(response : String) {
-        let map : Map<String, Value> = serde_json::from_str(&response).unwrap();
-
+        serde_json::from_str(&response).unwrap()
+        //if map.contains_key(String::from("I"))
     }
 }
 
@@ -46,11 +46,11 @@ impl ClientTransport for ServerSentEventsTransport {
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
-    ) -> Box<Future<Item = (), Error = ()>> {
+    ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
         unimplemented!();
-        self.open_connection(url, connection_data, connection_token, protocol);
-        Box::new(ok::<_,_>(()))
-
+        let mut map = Map::new();
+        self.open_connection(url, connection_data, connection_token, protocol, &mut map);
+        Box::new(ok::<_,_>(map))
     }
 
 

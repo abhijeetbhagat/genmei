@@ -1,6 +1,7 @@
 use futures::future::{Future, FutureResult};
 use negotiationresponse::NegotiationResponse;
 use connection::Connection;
+use serde_json::{Map, Value};
 
 pub trait ClientTransport {
     fn negotiate(
@@ -15,7 +16,7 @@ pub trait ClientTransport {
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
-    ) -> Box<Future<Item = (), Error = ()>>;
+    ) -> Box<Future<Item = Map<String, Value>, Error = ()>>;
     fn send(&self) -> Box<Future<Item = (), Error = ()>>;
     fn abort(&self) -> Box<Future<Item = (), Error = ()>>;
 }
