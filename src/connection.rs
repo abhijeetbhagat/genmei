@@ -10,6 +10,8 @@ use version::Version;
 use message::InvocationMessage;
 use clienttransport::ClientTransport;
 use std::ops::Deref;
+use std::rc::Rc;
+use serde_json::{Map, Value};
 
 pub trait Connection {
     fn get_url(&self) -> String;
@@ -33,7 +35,7 @@ pub struct HubConnection {
     query_string: String,
     query_string_map: HashMap<String, String>,
     callbacks_map: HashMap<String, fn(HubResult)>,
-    //proxies_map : HashMap<String, Proxy>,
+    proxies_map : HashMap<String, Rc<Proxy>>,
     //TODO abhi: remove this field after proxies_map is used
     hub_name: String,
     pub headers: HashMap<String, String>,
@@ -57,9 +59,11 @@ impl HubConnection {
         }
     }*/
 
-    pub fn create_hub_proxy(&mut self, hub_name: String) -> Proxy {
+        pub fn create_hub_proxy(&mut self, hub_name: String) -> Rc<Proxy> {
         self.hub_name = hub_name.clone();
-        Proxy::new(/*self,*/ hub_name)
+        let proxy = Proxy::new(/*self,*/ hub_name);
+        self.proxies_map.insert(hub_name.clone(), Rc::new(proxy));
+        Rc::clone(self.proxies_map.get(&hub_name).unwrap())
     }
 
     /*pub fn start<T, E> (&self) -> FutureResult<T, E> {
@@ -100,12 +104,21 @@ impl HubConnection {
         let protocol = self.get_protocol();
         let connection_data = self.get_connection_data();
         let connection_token = self.get_connection_token();
-        self.client_transport.as_mut().unwrap().start(
+        let response = self.client_transport.as_mut().unwrap().start(
             url.as_str(),
             connection_data.as_str(),
             connection_token.as_str(),
             protocol.as_str(),
-        );
+        ).unwrap();
+
+        self.process_response(response);
+    }
+
+    fn process_response(&mut self, response : Map<String, Value>) {
+        if response.contains_key(&String::from("I")) {
+            
+        }
+
     }
 }
 
@@ -217,6 +230,7 @@ impl HubConnectionBuilder {
             query_string_map: self.query_string_map.unwrap_or(HashMap::new()),
             callbacks_map: HashMap::new(),
             hub_name: String::new(),
+            proxies_map : HashMap::new(),
             headers: HashMap::new(),
             on_received: None,
             on_closed: None,
