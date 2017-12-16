@@ -59,9 +59,9 @@ impl HubConnection {
         }
     }*/
 
-        pub fn create_hub_proxy(&mut self, hub_name: String) -> Rc<Proxy> {
-        self.hub_name = hub_name.clone();
-        let proxy = Proxy::new(/*self,*/ hub_name);
+    pub fn create_hub_proxy(&mut self, hub_name: String) -> Rc<Proxy> {
+        //self.hub_name = hub_name.clone();
+        let proxy = Proxy::new(/*self,*/ hub_name.clone());
         self.proxies_map.insert(hub_name.clone(), Rc::new(proxy));
         Rc::clone(self.proxies_map.get(&hub_name).unwrap())
     }
@@ -109,7 +109,9 @@ impl HubConnection {
             connection_data.as_str(),
             connection_token.as_str(),
             protocol.as_str(),
-        ).unwrap();
+        ).map(|r| {
+            r
+        }).wait().unwrap();
 
         self.process_response(response);
     }
