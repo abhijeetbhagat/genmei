@@ -15,16 +15,17 @@ mod protocol;
 mod hubproxy;
 mod connection;
 mod hubresult;
-mod httpbasedtransport;
+mod transports;
+//mod httpbasedtransport;
 mod httpclient;
 mod subscription;
 mod urlbuilder;
 mod version;
 mod negotiationresponse;
-mod clienttransport;
-mod autotransport;
-mod serversenteventstransport;
-mod longpollingtransport;
+//mod clienttransport;
+//mod autotransport;
+//mod serversenteventstransport;
+//mod longpollingtransport;
 
 #[cfg(test)]
 mod tests {

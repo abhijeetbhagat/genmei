@@ -1,11 +1,11 @@
-use clienttransport::ClientTransport;
+use transports::clienttransport::ClientTransport;
 use futures::future::{ok, Future};
 use negotiationresponse::NegotiationResponse;
 use httpclient::HttpClient;
 use urlbuilder::UrlBuilder;
 use connection::Connection;
-use serversenteventstransport::ServerSentEventsTransport;
-use longpollingtransport::LongPollingTransport;
+use transports::serversenteventstransport::ServerSentEventsTransport;
+use transports::longpollingtransport::LongPollingTransport;
 use serde_json;
 use serde_json::{Map, Value};
 

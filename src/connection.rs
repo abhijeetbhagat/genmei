@@ -8,7 +8,7 @@ use futures::future::*;
 use futures::future::Future;
 use version::Version;
 use message::InvocationMessage;
-use clienttransport::ClientTransport;
+use transports::clienttransport::ClientTransport;
 use std::ops::Deref;
 use std::rc::Rc;
 use serde_json::{Map, Value};

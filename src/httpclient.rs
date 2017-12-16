@@ -1,6 +1,6 @@
 extern crate hyper;
 extern crate tokio_core;
-use httpbasedtransport::HttpBasedTransport;
+use transports::httpbasedtransport::HttpBasedTransport;
 use hyper::{Client, Error, Response};
 use hyper::client::{FutureResponse, HttpConnector};
 use tokio_core::reactor::Core;

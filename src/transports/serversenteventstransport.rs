@@ -1,4 +1,4 @@
-use clienttransport::ClientTransport;
+use transports::clienttransport::ClientTransport;
 use futures::future::{Future, ok};
 use negotiationresponse::NegotiationResponse;
 use httpclient::{HttpClient, DefaultHttpClient};
