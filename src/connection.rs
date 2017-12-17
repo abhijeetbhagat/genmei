@@ -9,6 +9,8 @@ use futures::future::Future;
 use version::Version;
 use message::InvocationMessage;
 use transports::clienttransport::ClientTransport;
+use transports::autotransport::AutoTransport;
+use httpclient::DefaultHttpClient;
 use std::ops::Deref;
 use std::rc::Rc;
 use serde_json::{Map, Value};
@@ -36,7 +38,7 @@ pub struct HubConnection {
     query_string: String,
     query_string_map: HashMap<String, String>,
     callbacks_map: HashMap<String, fn(HubResult)>,
-    proxies_map : HashMap<String, Rc<RefCell<Proxy>>>,
+    proxies_map: HashMap<String, Rc<RefCell<Proxy>>>,
     //TODO abhi: remove this field after proxies_map is used
     hub_name: String,
     pub headers: HashMap<String, String>,
@@ -63,7 +65,8 @@ impl HubConnection {
     pub fn create_hub_proxy(&mut self, hub_name: String) -> Rc<RefCell<Proxy>> {
         //self.hub_name = hub_name.clone();
         let proxy = Proxy::new(/*self,*/ hub_name.clone());
-        self.proxies_map.insert(hub_name.clone(), Rc::new(RefCell::new(proxy)));
+        self.proxies_map
+            .insert(hub_name.clone(), Rc::new(RefCell::new(proxy)));
         Rc::clone(self.proxies_map.get(&hub_name).unwrap())
     }
 
@@ -105,23 +108,26 @@ impl HubConnection {
         let protocol = self.get_protocol();
         let connection_data = self.get_connection_data();
         let connection_token = self.get_connection_token();
-        let response = self.client_transport.as_mut().unwrap().start(
-            url.as_str(),
-            connection_data.as_str(),
-            connection_token.as_str(),
-            protocol.as_str(),
-        ).map(|r| {
-            r
-        }).wait().unwrap();
+        let response = self.client_transport
+            .as_mut()
+            .unwrap()
+            .start(
+                url.as_str(),
+                connection_data.as_str(),
+                connection_token.as_str(),
+                protocol.as_str(),
+            )
+            .map(|r| r)
+            .wait()
+            .unwrap();
 
         self.process_response(response);
     }
 
-    fn process_response(&mut self, response : Map<String, Value>) {
+    fn process_response(&mut self, response: Map<String, Value>) {
         if response.contains_key(&String::from("I")) {
-            
+            println!("{}", response.get(&String::from("I")).unwrap());
         }
-
     }
 }
 
@@ -156,7 +162,6 @@ impl Connection for HubConnection {
     }
 
     fn start(&mut self) -> Box<Future<Item = (), Error = ()>> {
-        unimplemented!();
         let url = self.get_url();
         let protocol = self.get_protocol();
         let connection_data = self.get_connection_data();
@@ -233,7 +238,7 @@ impl HubConnectionBuilder {
             query_string_map: self.query_string_map.unwrap_or(HashMap::new()),
             callbacks_map: HashMap::new(),
             hub_name: String::new(),
-            proxies_map : HashMap::new(),
+            proxies_map: HashMap::new(),
             headers: HashMap::new(),
             on_received: None,
             on_closed: None,
@@ -244,7 +249,9 @@ impl HubConnectionBuilder {
             protocol: Version::new(1, 4), //TODO abhi: should this be read from a config file?
             connection_token: String::new(),
             connection_id: String::new(),
-            client_transport: None,
+            client_transport: Some(Box::new(AutoTransport::new(Box::new(
+                DefaultHttpClient::new(),
+            )))),
         }
     }
 }
