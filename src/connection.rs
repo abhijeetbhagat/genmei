@@ -12,6 +12,7 @@ use transports::clienttransport::ClientTransport;
 use std::ops::Deref;
 use std::rc::Rc;
 use serde_json::{Map, Value};
+use std::cell::RefCell;
 
 pub trait Connection {
     fn get_url(&self) -> String;
@@ -35,7 +36,7 @@ pub struct HubConnection {
     query_string: String,
     query_string_map: HashMap<String, String>,
     callbacks_map: HashMap<String, fn(HubResult)>,
-    proxies_map : HashMap<String, Rc<Proxy>>,
+    proxies_map : HashMap<String, Rc<RefCell<Proxy>>>,
     //TODO abhi: remove this field after proxies_map is used
     hub_name: String,
     pub headers: HashMap<String, String>,
@@ -59,10 +60,10 @@ impl HubConnection {
         }
     }*/
 
-    pub fn create_hub_proxy(&mut self, hub_name: String) -> Rc<Proxy> {
+    pub fn create_hub_proxy(&mut self, hub_name: String) -> Rc<RefCell<Proxy>> {
         //self.hub_name = hub_name.clone();
         let proxy = Proxy::new(/*self,*/ hub_name.clone());
-        self.proxies_map.insert(hub_name.clone(), Rc::new(proxy));
+        self.proxies_map.insert(hub_name.clone(), Rc::new(RefCell::new(proxy)));
         Rc::clone(self.proxies_map.get(&hub_name).unwrap())
     }
 
