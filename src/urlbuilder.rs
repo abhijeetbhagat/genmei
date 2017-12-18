@@ -2,6 +2,7 @@ use connection::Connection;
 
 pub struct UrlBuilder;
 
+//http://localhost:8080negotiate?clientProtocol=1.4&connectionData=[%7B%22Name%22:%22%22%7D]&    pub fn create_base_url<'a>(
 impl UrlBuilder {
     pub fn create_base_url<'a>(
         url: &str,
@@ -13,12 +14,17 @@ impl UrlBuilder {
     ) -> String {
         let mut _url = String::new();
         _url.push_str(url);
+        let index = _url.rfind('/');
+        if index.is_some() && index.unwrap() != _url.len() - 1 {
+            _url.push('/')
+        }
         _url.push_str(command);
         _url.push('?');
         UrlBuilder::append_client_protocol(&mut _url, protocol);
         UrlBuilder::append_transport(&mut _url, transport);
         UrlBuilder::append_connection_data(&mut _url, connection_data);
         UrlBuilder::append_connection_token(&mut _url, connection_token);
+        _url.pop(); //remove the trailing '&'
         _url
     }
 

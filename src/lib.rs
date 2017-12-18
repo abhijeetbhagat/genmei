@@ -40,6 +40,7 @@ mod tests {
     use negotiationresponse::NegotiationResponse;
     use httpclient::{DefaultHttpClient, HttpClient};
     use hyper;
+    use urlbuilder::UrlBuilder;
 
 
     //http://localhost:8080/signalr/negotiate?clientProtocol=1.4&connectionData=[%7B%22Name%22:%22MyHub%22%7D]
@@ -168,4 +169,20 @@ mod tests {
         let uri = "http://localhost:8080/signalr/negotiate?clientProtocol=1.4&connectionData=[%7B%22Name%22:%22MyHub%22%7D]";
         http_client.get(uri);
     }
+
+    #[test]
+    fn test_url_building() {
+        assert_eq!(
+            UrlBuilder::create_base_url(
+                "http://localhost:8080",
+                "negotiate",
+                None,
+                "abc",
+                None,
+                "4.3"
+            ),
+            String::from("http://localhost:8080/negotiate?clientProtocol=4.3&connectionData=abc")
+        );
+    }
+
 }
