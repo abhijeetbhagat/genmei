@@ -13,7 +13,7 @@ impl UrlBuilder {
         protocol: &str,
     ) -> String {
         let mut _url = String::new();
-        _url.push_str(url);
+        _url.push_str(url.trim());
         if _url.as_bytes()[_url.len()-1] != '/' as u8 {
             _url.push('/')
         }
