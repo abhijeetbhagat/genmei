@@ -183,6 +183,16 @@ mod tests {
             ),
             String::from("http://localhost:8080/negotiate?clientProtocol=4.3&connectionData=abc")
         );
-    }
-
+        assert_eq!(
+            UrlBuilder::create_base_url(
+                "http://localhost:8080/",
+                "negotiate",
+                None,
+                "abc",
+                None,
+                "4.3"
+            ),
+            String::from("http://localhost:8080/negotiate?clientProtocol=4.3&connectionData=abc")
+        );
+    } 
 }

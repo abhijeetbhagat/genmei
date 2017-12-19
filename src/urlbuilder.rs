@@ -14,8 +14,7 @@ impl UrlBuilder {
     ) -> String {
         let mut _url = String::new();
         _url.push_str(url);
-        let index = _url.rfind('/');
-        if index.is_some() && index.unwrap() != _url.len() - 1 {
+        if _url.as_bytes()[_url.len()-1] != '/' as u8 {
             _url.push('/')
         }
         _url.push_str(command);
