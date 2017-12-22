@@ -50,9 +50,22 @@ impl UrlBuilder {
     fn append_connection_token(url: &mut String, connection_token: Option<&str>) {
         if let Some(connection_token) = connection_token {
             url.push_str("connectionToken=");
-            url.push_str(connection_token);
+            url.push_str(UrlBuilder::escape_token(connection_token).as_str());
             url.push('&');
         }
+    }
+
+    fn escape_token(connection_token : &str) -> String {
+        let mut escaped_token = String::with_capacity(connection_token.len());
+        for c in connection_token.chars() {
+            match c {
+                '/' => escaped_token.push_str("%2F"),
+                '+' => escaped_token.push_str("%2B"),
+                '=' => escaped_token.push_str("%3D"), 
+                _   => escaped_token.push(c)
+            }
+        }
+        escaped_token 
     }
 
     pub fn create_negotiate_url(url: &str, connection_data: &str, protocol: &str) -> String {
