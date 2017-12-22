@@ -28,16 +28,17 @@ impl ServerSentEventsTransport {
     ) {
         let url = UrlBuilder::create_connect_url(
             url,
-            Some("serversentevent"),
+            Some("serverSentEvents"),
             connection_data,
             Some(connection_token),
             protocol,
         );
-        let response = self.http_client.get(url.as_str());
+        let response = self.http_client.get(&url);
         ServerSentEventsTransport::process_response(response)
     }
 
     fn process_response(response: String) {
+        println!("serversent: process_response - {}", response);
         serde_json::from_str(&response).unwrap()
         //if map.contains_key(String::from("I"))
     }
@@ -60,7 +61,6 @@ impl ClientTransport for ServerSentEventsTransport {
         connection_token: &str,
         protocol: &str,
     ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
-        unimplemented!();
         let mut map = Map::new();
         self.open_connection(url, connection_data, connection_token, protocol, &mut map);
         Box::new(ok::<_, _>(map))
