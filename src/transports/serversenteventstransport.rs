@@ -6,19 +6,20 @@ use urlbuilder::UrlBuilder;
 use connection::Connection;
 use serde_json;
 use serde_json::{Map, Value};
+use std::sync::Arc;
 use std::sync::mpsc::{Sender, Receiver};
 use std::sync::mpsc;
 use std::thread;
 use std::marker::Send;
 
 pub struct ServerSentEventsTransport {
-    http_client: Box<HttpClient + Send>,
+    http_client: Arc<Box<HttpClient + Send + Sync>>,
 }
 
 impl ServerSentEventsTransport {
     pub fn new() -> Self {
         ServerSentEventsTransport {
-            http_client: Box::new(DefaultHttpClient::new()),
+            http_client: Arc::new(Box::new(DefaultHttpClient::new())),
         }
     }
 
@@ -37,9 +38,13 @@ impl ServerSentEventsTransport {
             Some(connection_token),
             protocol,
         );
-        thread::spawn(||{
-            let response = self.http_client.get(&url);
-        });
+
+        {
+            let mut client = self.http_client.clone();
+            thread::spawn(move||{
+                let response = Arc::get_mut(&mut client).unwrap().get(&url);
+            });
+        }
         //ServerSentEventsTransport::process_response(response)
     }
 

@@ -23,6 +23,7 @@ pub struct DefaultHttpClient {
 }
 
 unsafe impl Send for DefaultHttpClient {}
+unsafe impl Sync for DefaultHttpClient {}
 
 impl DefaultHttpClient {
     pub fn new() -> Self {
