@@ -10,6 +10,7 @@ use std::io::{self, Write};
 use connection::HubConnection;
 use std::any::Any;
 use futures::prelude::*;
+use std::marker::Send;
 
 pub trait HttpClient {
     fn get(&mut self, url: &str) -> String;
@@ -20,6 +21,8 @@ pub struct DefaultHttpClient {
     pub client: Client<HttpConnector>,
     pub core: Core,
 }
+
+unsafe impl Send for DefaultHttpClient {}
 
 impl DefaultHttpClient {
     pub fn new() -> Self {
@@ -36,7 +39,6 @@ impl DefaultHttpClient {
 impl HttpClient for DefaultHttpClient {
     fn get(&mut self, url: &str) -> String {
         //unimplemented!();
-        println!("{}", url);
         let work = self.client.get(url.parse().unwrap()).and_then(|res| {
             res.body()
                 .fold(Vec::new(), |mut v, chunk| {

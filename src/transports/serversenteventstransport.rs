@@ -6,9 +6,13 @@ use urlbuilder::UrlBuilder;
 use connection::Connection;
 use serde_json;
 use serde_json::{Map, Value};
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc;
+use std::thread;
+use std::marker::Send;
 
 pub struct ServerSentEventsTransport {
-    http_client: Box<HttpClient>,
+    http_client: Box<HttpClient + Send>,
 }
 
 impl ServerSentEventsTransport {
@@ -33,8 +37,10 @@ impl ServerSentEventsTransport {
             Some(connection_token),
             protocol,
         );
-        let response = self.http_client.get(&url);
-        ServerSentEventsTransport::process_response(response)
+        thread::spawn(||{
+            let response = self.http_client.get(&url);
+        });
+        //ServerSentEventsTransport::process_response(response)
     }
 
     fn process_response(response: String) {
