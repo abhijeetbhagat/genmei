@@ -39,7 +39,6 @@ impl DefaultHttpClient {
 
 impl HttpClient for DefaultHttpClient {
     fn get(&mut self, url: &str) -> String {
-        //unimplemented!();
         let work = self.client.get(url.parse().unwrap()).and_then(|res| {
             res.body()
                 .fold(Vec::new(), |mut v, chunk| {
