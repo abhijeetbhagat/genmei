@@ -35,7 +35,6 @@ impl AutoTransport {
         protocol: &str,
         i: usize,
     ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
-        unimplemented!();
         {
             if i < self.transports.len() {
                 let transport = &mut self.transports[i];
