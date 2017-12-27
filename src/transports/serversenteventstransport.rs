@@ -45,7 +45,9 @@ impl ServerSentEventsTransport {
             let mut client = self.http_client.clone();
             thread::spawn(move||{
                 let mut client = client.lock().unwrap();//Arc::get_mut(&mut client).unwrap();
-                let response = client.get(&url);
+                let response = client.get(&url, Some(vec![("Accept", "text/event-stream"),
+                                                     ("User-Agent", "genmei")]));
+                println!("response {}", response);
                 _tx.send(response).unwrap();
             }).join();
         }

@@ -55,7 +55,7 @@ impl ClientTransport for AutoTransport {
     ) -> Box<Future<Item = NegotiationResponse, Error = ()>> {
         let url = UrlBuilder::create_negotiate_url(url, connection_data, protocol);
         //TODO abhi: get should return a future; so process accordingly
-        let response = self.http_client.get(url.as_str());
+        let response = self.http_client.get(url.as_str(), None);
         let response = serde_json::from_str(&response).unwrap();
         Box::new(ok::<_, _>(response))
     }

@@ -1,7 +1,7 @@
 extern crate hyper;
 extern crate tokio_core;
 use transports::httpbasedtransport::HttpBasedTransport;
-use hyper::{Client, Error, Response};
+use hyper::{Client, Error, Response, Request, Method};
 use hyper::client::{FutureResponse, HttpConnector};
 use tokio_core::reactor::Core;
 use futures::{Future, Stream};
@@ -13,7 +13,7 @@ use futures::prelude::*;
 use std::marker::Send;
 
 pub trait HttpClient {
-    fn get(&mut self, url: &str) -> String;
+    fn get(&mut self, url: &str, headers : Option<Vec<(&'static str, &'static str)>>) -> String;
     fn post(&self) -> Response;
 }
 
@@ -38,10 +38,18 @@ impl DefaultHttpClient {
 }
 
 impl HttpClient for DefaultHttpClient {
-    fn get(&mut self, url: &str) -> String {
-        let work = self.client.get(url.parse().unwrap()).and_then(|res| {
+    fn get(&mut self, url: &str, headers : Option<Vec<(&'static str, &'static str)>>) -> String {
+        let mut request = Request::new(Method::Get, url.parse().unwrap());
+        if headers.is_some() {
+            for (k, v) in headers.unwrap() {
+                request.headers_mut().set_raw(k, v);
+            }
+        }
+
+        let work = self.client.request(request).and_then(|res| {
             res.body()
                 .fold(Vec::new(), |mut v, chunk| {
+                    println!("chunk: {:?}", chunk);
                     v.extend(&chunk[..]);
                     future::ok::<_, Error>(v)
                 })
