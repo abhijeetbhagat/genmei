@@ -14,7 +14,7 @@ impl UrlBuilder {
     ) -> String {
         let mut _url = String::new();
         _url.push_str(url.trim());
-        if _url.as_bytes()[_url.len()-1] != '/' as u8 {
+        if _url.as_bytes()[_url.len() - 1] != '/' as u8 {
             _url.push('/')
         }
         _url.push_str(command);
@@ -55,17 +55,17 @@ impl UrlBuilder {
         }
     }
 
-    fn escape_token(connection_token : &str) -> String {
+    fn escape_token(connection_token: &str) -> String {
         let mut escaped_token = String::with_capacity(connection_token.len());
         for c in connection_token.chars() {
             match c {
                 '/' => escaped_token.push_str("%2F"),
                 '+' => escaped_token.push_str("%2B"),
-                '=' => escaped_token.push_str("%3D"), 
-                _   => escaped_token.push(c)
+                '=' => escaped_token.push_str("%3D"),
+                _ => escaped_token.push(c),
             }
         }
-        escaped_token 
+        escaped_token
     }
 
     pub fn create_negotiate_url(url: &str, connection_data: &str, protocol: &str) -> String {

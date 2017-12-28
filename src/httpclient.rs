@@ -1,7 +1,7 @@
 extern crate hyper;
 extern crate tokio_core;
 use transports::httpbasedtransport::HttpBasedTransport;
-use hyper::{Client, Error, Response, Request, Method};
+use hyper::{Client, Error, Method, Request, Response};
 use hyper::client::{FutureResponse, HttpConnector};
 use tokio_core::reactor::Core;
 use futures::{Future, Stream};
@@ -12,8 +12,10 @@ use std::any::Any;
 use futures::prelude::*;
 use std::marker::Send;
 
+pub type OptionalRawHeaders = Option<Vec<(&'static str, &'static str)>>;
+
 pub trait HttpClient {
-    fn get(&mut self, url: &str, headers : Option<Vec<(&'static str, &'static str)>>) -> String;
+    fn get(&mut self, url: &str, headers: OptionalRawHeaders) -> String;
     fn post(&self) -> Response;
 }
 
@@ -38,7 +40,7 @@ impl DefaultHttpClient {
 }
 
 impl HttpClient for DefaultHttpClient {
-    fn get(&mut self, url: &str, headers : Option<Vec<(&'static str, &'static str)>>) -> String {
+    fn get(&mut self, url: &str, headers: OptionalRawHeaders) -> String {
         let mut request = Request::new(Method::Get, url.parse().unwrap());
         if headers.is_some() {
             for (k, v) in headers.unwrap() {

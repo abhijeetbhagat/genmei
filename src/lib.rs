@@ -10,6 +10,7 @@ extern crate serde_derive;
 #[macro_use]
 extern crate serde_json;
 extern crate tokio_core;
+
 mod message;
 mod protocol;
 mod hubproxy;
@@ -71,13 +72,15 @@ mod tests {
 
     #[test]
     fn test_connection_create() {
-        let mut connection = HubConnectionBuilder::new(String::from("http://localhost:8080"))
-            .use_default_url(false)
+        let mut connection = HubConnectionBuilder::new(String::from(
+            "http://localhost:8080/signalr",
+        )).use_default_url(false)
             .finish();
 
         let mut proxy = connection.create_hub_proxy(String::from("MyHub"));
-        //proxy.borrow_mut().on::<String>(String::from("addMessage"), Box::new(|s| {}));
-        //proxy.borrow_mut().invoke(String::from("addMessage"), vec![&String::from("abhi"), &1]);
+        //TODO abhi: we can do better (using abstractions?) than calling methods like this:
+        //(*proxy.borrow_mut()).on::<String>(String::from("addMessage"), Box::new(|s|{}));
+        //(*proxy.borrow_mut()).invoke(String::from("addMessage"), vec![&String::from("abhi"), &1]);
 
         connection.start().wait();
     }
@@ -167,7 +170,25 @@ mod tests {
     fn test_httpclient_get() {
         let mut http_client = DefaultHttpClient::new();
         let uri = "http://localhost:8080/signalr/negotiate?clientProtocol=1.4&connectionData=[%7B%22Name%22:%22MyHub%22%7D]";
-        http_client.get(uri);
+        //println!("response : {}", http_client.get(uri));
+    }
+
+    use std::sync::{Arc, Mutex};
+    use std::thread;
+    #[test]
+    #[ignore]
+    fn test_httpclient_connect() {
+        let mut http_client = Arc::new(Mutex::new(DefaultHttpClient::new()));
+        let uri = "http://localhost:8080/signalr/connect?clientProtocol=1.4&transport=serverSentEvents&connectionData=[%7B%22Name%22:%22MyHub%22%7D]&connectionToken=AQAAANCMnd8BFdERjHoAwE%2FCl%2BsBAAAAJKIyAZXvi0e08Sl079QEAAAAAAACAAAAAAADZgAAwAAAABAAAAAEI40PJoZNyNbb7xwhjyb0AAAAAASAAACgAAAAEAAAAJfqYifv4EDPC3iSrCe5OAIoAAAAUGyNWG4LT4BmyC3Ax1byytj2M4gAc7M8OVH67i8pTTFJnmU8c2C54RQAAABL1XJcBwkZhej43fG411TJ%2Ff5mDA%3D%3D";
+        let mut c = http_client.clone();
+        let h = thread::spawn(move || {
+            println!("spawned thread");
+            let mut c = c.lock().unwrap();
+            //c.get(uri.clone());
+        });
+        println!("main thread");
+        //println!("response : {}", http_client.lock().unwrap().get(uri));
+        h.join();
     }
 
     #[test]
@@ -194,5 +215,5 @@ mod tests {
             ),
             String::from("http://localhost:8080/negotiate?clientProtocol=4.3&connectionData=abc")
         );
-    } 
+    }
 }

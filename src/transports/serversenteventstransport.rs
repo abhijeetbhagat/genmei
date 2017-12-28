@@ -7,7 +7,7 @@ use connection::Connection;
 use serde_json;
 use serde_json::{Map, Value};
 use std::sync::{Arc, Mutex};
-use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc::{Receiver, Sender};
 use std::sync::mpsc;
 use std::thread;
 use std::marker::Send;
@@ -43,10 +43,15 @@ impl ServerSentEventsTransport {
         {
             let _tx = tx.clone();
             let mut client = self.http_client.clone();
-            thread::spawn(move||{
-                let mut client = client.lock().unwrap();//Arc::get_mut(&mut client).unwrap();
-                let response = client.get(&url, Some(vec![("Accept", "text/event-stream"),
-                                                     ("User-Agent", "genmei")]));
+            thread::spawn(move || {
+                let mut client = client.lock().unwrap(); //Arc::get_mut(&mut client).unwrap();
+                let response = client.get(
+                    &url,
+                    Some(vec![
+                        ("Accept", "text/event-stream"),
+                        ("User-Agent", "genmei"),
+                    ]),
+                );
                 println!("response {}", response);
                 _tx.send(response).unwrap();
             }).join();

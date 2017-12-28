@@ -149,7 +149,10 @@ impl Connection for HubConnection {
         //TODO abhi use this line when proxies_map is used
         //For now, just use the hub_name
         //String::from()
-        format!("[%7B%22Name%22:%22{}%22%7D]", self.proxies_map.keys().take(1).next().unwrap())
+        format!(
+            "[%7B%22Name%22:%22{}%22%7D]",
+            self.proxies_map.keys().take(1).next().unwrap()
+        )
     }
 
     fn json_serialize(&self, message: &InvocationMessage) -> String {
@@ -174,7 +177,8 @@ impl Connection for HubConnection {
                 self.connection_token = r.connection_token;
                 self.connection_id = r.connection_id;
                 self.start_transport()
-            }).wait(); //TODO abhi: remove wait(); this is called only for testing
+            })
+            .wait(); //TODO abhi: remove wait(); this is called only for testing
         Box::new(result(Ok(())))
         /*Box::new(self.client_transport.as_mut().unwrap().negotiate().map(|response|{
             self.connection_token = response.connection_token;
