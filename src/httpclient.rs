@@ -11,11 +11,13 @@ use connection::HubConnection;
 use std::any::Any;
 use futures::prelude::*;
 use std::marker::Send;
+use std::sync::mpsc::Sender;
 
 pub type OptionalRawHeaders = Option<Vec<(&'static str, &'static str)>>;
 
 pub trait HttpClient {
     fn get(&mut self, url: &str, headers: OptionalRawHeaders) -> String;
+    fn get_stream(&mut self, url : &str, headers : OptionalRawHeaders, transmitter : Sender<Vec<i32>>);
     fn post(&self) -> Response;
 }
 
@@ -62,6 +64,22 @@ impl HttpClient for DefaultHttpClient {
         });
         //TODO abhi: work should not be run here
         self.core.run(work).unwrap()
+    }
+
+    fn get_stream(&mut self, url : &str, headers : OptionalRawHeaders, transmitter : Sender<Vec<i32>>) {
+        let mut request = Request::new(Method::Get, url.parse().unwrap());
+        if headers.is_some() {
+            for (k, v) in headers.unwrap() {
+                request.headers_mut().set_raw(k, v);
+            }
+        }
+
+        let work = self.client.request(request).and_then(|res| {
+            res.body()
+            .for_each(|chunk| future::ok::<_, Error>(chunk))
+        });
+        //TODO abhi: work should not be run here
+        self.core.run(work);
     }
 
     fn post(&self) -> Response {
