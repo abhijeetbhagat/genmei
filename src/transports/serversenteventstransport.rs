@@ -52,7 +52,6 @@ impl ServerSentEventsTransport {
                         ("User-Agent", "genmei"),
                     ]),
                 );
-                println!("response {}", response);
                 _tx.send(response).unwrap();
             }).join();
         }

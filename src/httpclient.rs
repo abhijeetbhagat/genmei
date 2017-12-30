@@ -12,12 +12,14 @@ use std::any::Any;
 use futures::prelude::*;
 use std::marker::Send;
 use std::sync::mpsc::Sender;
+use std::thread;
+use std::sync::{Arc, Mutex};
 
 pub type OptionalRawHeaders = Option<Vec<(&'static str, &'static str)>>;
 
 pub trait HttpClient {
     fn get(&mut self, url: &str, headers: OptionalRawHeaders) -> String;
-    fn get_stream(&mut self, url : &str, headers : OptionalRawHeaders, transmitter : Sender<Vec<i32>>);
+    fn get_stream(&mut self, url : &str, headers : OptionalRawHeaders, transmitter : Sender<Vec<u8>>);
     fn post(&self) -> Response;
 }
 
@@ -66,7 +68,7 @@ impl HttpClient for DefaultHttpClient {
         self.core.run(work).unwrap()
     }
 
-    fn get_stream(&mut self, url : &str, headers : OptionalRawHeaders, transmitter : Sender<Vec<i32>>) {
+    fn get_stream(&mut self, url : &str, headers : OptionalRawHeaders, transmitter : Sender<Vec<u8>>) {
         let mut request = Request::new(Method::Get, url.parse().unwrap());
         if headers.is_some() {
             for (k, v) in headers.unwrap() {
@@ -74,12 +76,21 @@ impl HttpClient for DefaultHttpClient {
             }
         }
 
-        let work = self.client.request(request).and_then(|res| {
-            res.body()
-            .for_each(|chunk| future::ok::<_, Error>(chunk))
+        thread::spawn(move ||{
+            let mut core = Core::new().unwrap();
+            let client = Client::new(&core.handle());
+            let work = client.request(request).and_then(|res| {
+                res.body()
+                .for_each(|chunk| {
+                    println!("chunk: {:?}", chunk);
+                    transmitter.send(chunk.to_vec()).expect("Sender error: ");
+                    future::ok::<_, _>(())
+                })
+            });
+            core.run(work);
         });
         //TODO abhi: work should not be run here
-        self.core.run(work);
+        //self.core.run(work);
     }
 
     fn post(&self) -> Response {

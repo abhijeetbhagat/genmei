@@ -173,24 +173,6 @@ mod tests {
         //println!("response : {}", http_client.get(uri));
     }
 
-    use std::sync::{Arc, Mutex};
-    use std::thread;
-    #[test]
-    #[ignore]
-    fn test_httpclient_connect() {
-        let mut http_client = Arc::new(Mutex::new(DefaultHttpClient::new()));
-        let uri = "http://localhost:8080/signalr/connect?clientProtocol=1.4&transport=serverSentEvents&connectionData=[%7B%22Name%22:%22MyHub%22%7D]&connectionToken=AQAAANCMnd8BFdERjHoAwE%2FCl%2BsBAAAAJKIyAZXvi0e08Sl079QEAAAAAAACAAAAAAADZgAAwAAAABAAAAAEI40PJoZNyNbb7xwhjyb0AAAAAASAAACgAAAAEAAAAJfqYifv4EDPC3iSrCe5OAIoAAAAUGyNWG4LT4BmyC3Ax1byytj2M4gAc7M8OVH67i8pTTFJnmU8c2C54RQAAABL1XJcBwkZhej43fG411TJ%2Ff5mDA%3D%3D";
-        let mut c = http_client.clone();
-        let h = thread::spawn(move || {
-            println!("spawned thread");
-            let mut c = c.lock().unwrap();
-            //c.get(uri.clone());
-        });
-        println!("main thread");
-        //println!("response : {}", http_client.lock().unwrap().get(uri));
-        h.join();
-    }
-
     #[test]
     fn test_url_building() {
         assert_eq!(
@@ -215,5 +197,21 @@ mod tests {
             ),
             String::from("http://localhost:8080/negotiate?clientProtocol=4.3&connectionData=abc")
         );
+    }
+
+    use std::sync::mpsc::channel;
+    #[test]
+    #[ignore]
+    fn test_sse_streaming() {
+        let mut http_client = DefaultHttpClient::new();
+        let uri = "http://localhost:8080/signalr/connect?transport=serverSentEvents&clientProtocol=1.4&connectionData=[%7B%22Name%22:%22MyHub%22%7D]&connectionToken=AQAAANCMnd8BFdERjHoAwE%2FCl%2BsBAAAAJKIyAZXvi0e08Sl079QEAAAAAAACAAAAAAADZgAAwAAAABAAAACgHkzpuWmAtmAY8Rk2IRN7AAAAAASAAACgAAAAEAAAAPKUdM7j1ibT4s7FawppDCkoAAAAhcjKQMlrKgX%2F0%2FPBTXVTJAWzrY9xquk68WAQt04n9WrjHhgIhWUCzhQAAAD%2FR0E9HsraHZ6WTvaY7ktcm8stGQ%3D%3D";
+        let (tx, rx) = channel();
+        http_client.get_stream(uri, Some(vec![
+                        ("Accept", "text/event-stream"),
+                        ("User-Agent", "genmei"),
+                    ]), tx);
+        loop {
+            println!("recv chunk {:?}", rx.recv().unwrap());
+        }
     }
 }
