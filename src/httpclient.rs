@@ -19,7 +19,7 @@ pub type OptionalRawHeaders = Option<Vec<(&'static str, &'static str)>>;
 
 pub trait HttpClient {
     fn get(&mut self, url: &str, headers: OptionalRawHeaders) -> String;
-    fn get_stream(&mut self, url : &str, headers : OptionalRawHeaders, transmitter : Sender<Vec<u8>>);
+    fn get_stream(&mut self, url: &str, headers: OptionalRawHeaders, transmitter: Sender<Vec<u8>>);
     fn post(&self) -> Response;
 }
 
@@ -68,7 +68,7 @@ impl HttpClient for DefaultHttpClient {
         self.core.run(work).unwrap()
     }
 
-    fn get_stream(&mut self, url : &str, headers : OptionalRawHeaders, transmitter : Sender<Vec<u8>>) {
+    fn get_stream(&mut self, url: &str, headers: OptionalRawHeaders, transmitter: Sender<Vec<u8>>) {
         let mut request = Request::new(Method::Get, url.parse().unwrap());
         if headers.is_some() {
             for (k, v) in headers.unwrap() {
@@ -76,13 +76,12 @@ impl HttpClient for DefaultHttpClient {
             }
         }
 
-        thread::spawn(move ||{
+        thread::spawn(move || {
+            //TODO abhi: must reuse the existing core and client objects
             let mut core = Core::new().unwrap();
             let client = Client::new(&core.handle());
             let work = client.request(request).and_then(|res| {
-                res.body()
-                .for_each(|chunk| {
-                    println!("chunk: {:?}", chunk);
+                res.body().for_each(|chunk| {
                     transmitter.send(chunk.to_vec()).expect("Sender error: ");
                     future::ok::<_, _>(())
                 })

@@ -13,13 +13,13 @@ use std::thread;
 use std::marker::Send;
 
 pub struct ServerSentEventsTransport {
-    http_client: Arc<Mutex<Box<HttpClient + Send + Sync>>>,
+    http_client: Box<HttpClient>,
 }
 
 impl ServerSentEventsTransport {
     pub fn new() -> Self {
         ServerSentEventsTransport {
-            http_client: Arc::new(Mutex::new(Box::new(DefaultHttpClient::new()))),
+            http_client: Box::new(DefaultHttpClient::new()),
         }
     }
 
@@ -40,20 +40,46 @@ impl ServerSentEventsTransport {
         );
 
         let (tx, rx) = mpsc::channel();
-        {
-            let _tx = tx.clone();
-            let mut client = self.http_client.clone();
-            thread::spawn(move || {
-                let mut client = client.lock().unwrap(); //Arc::get_mut(&mut client).unwrap();
-                let response = client.get(
-                    &url,
-                    Some(vec![
-                        ("Accept", "text/event-stream"),
-                        ("User-Agent", "genmei"),
-                    ]),
-                );
-                _tx.send(response).unwrap();
-            }).join();
+        let response = self.http_client.get_stream(
+            &url,
+            Some(vec![
+                ("Accept", "text/event-stream"),
+                ("User-Agent", "genmei"),
+            ]),
+            tx
+        );
+        loop {
+            let vec = rx.recv().unwrap();
+            println!("oc: chunk: {:?}", vec);
+
+            if vec.len() > 19{
+                use std;
+                let data = std::str::from_utf8(&vec).unwrap();
+                /*{
+                    "C": "d-A2D08C-B,1|C,0|D,1",
+                    "M": [
+                            {
+                            "H": "MyHub",
+                            "M": "send",
+                            "A": [
+                            "client message"
+                            ]
+                            }
+                    ]
+                }*/
+                if data.contains("data:") { //we do not deal with "data:{}"
+                    let map : Map<String, Value> = serde_json::from_str(&data[5..]).unwrap();
+                    if map.contains_key(&String::from("S")) && map.get(&String::from("S")).unwrap().as_u64().unwrap() == 1u64 {
+                        //TODO abhi: initiate a 'start' request
+                    }
+                    if let Some(messages) = map.get(&String::from("M")) { 
+                        let messages = messages.as_array();
+                        for message in messages {
+
+                        }
+                    }
+                }
+            }
         }
         //ServerSentEventsTransport::process_response(response)
     }
