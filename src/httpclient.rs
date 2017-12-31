@@ -37,8 +37,8 @@ impl DefaultHttpClient {
         let client = Client::new(&core.handle());
 
         DefaultHttpClient {
-            client: client,
-            core: core,
+            client,
+            core,
         }
     }
 }

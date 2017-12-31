@@ -28,7 +28,7 @@ impl Proxy {
         let hub_name1 = hub_name.clone();
         Proxy {
             //connection : connection,
-            hub_name: hub_name,
+            hub_name,
             subscriptions: HashMap::new(),
         }
     }

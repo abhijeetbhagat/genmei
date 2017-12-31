@@ -8,8 +8,8 @@ pub struct Version {
 impl Version {
     pub fn new(major: i32, minor: i32) -> Self {
         Version {
-            major: major,
-            minor: minor,
+            major,
+            minor,
         }
     }
 }

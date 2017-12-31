@@ -209,7 +209,7 @@ pub struct HubConnectionBuilder {
 impl HubConnectionBuilder {
     pub fn new(url: String) -> Self {
         HubConnectionBuilder {
-            url: url,
+            url,
             use_default_url: false,
             query_string: None,
             query_string_map: None,

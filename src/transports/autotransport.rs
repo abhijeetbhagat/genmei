@@ -19,7 +19,7 @@ pub struct AutoTransport {
 impl AutoTransport {
     pub fn new(http_client: Box<HttpClient>) -> Self {
         AutoTransport {
-            http_client: http_client,
+            http_client,
             transports: vec![
                 Box::new(ServerSentEventsTransport::new()),
                 Box::new(LongPollingTransport),
