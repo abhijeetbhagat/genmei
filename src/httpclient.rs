@@ -36,10 +36,7 @@ impl DefaultHttpClient {
         let mut core = Core::new().unwrap();
         let client = Client::new(&core.handle());
 
-        DefaultHttpClient {
-            client,
-            core,
-        }
+        DefaultHttpClient { client, core }
     }
 }
 

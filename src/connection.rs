@@ -15,7 +15,7 @@ use std::ops::Deref;
 use std::rc::Rc;
 use serde_json::{Map, Value};
 use std::cell::RefCell;
-use std::sync::mpsc::{channel, Sender, Receiver};
+use std::sync::mpsc::{channel, Receiver, Sender};
 
 pub trait Connection {
     fn get_url(&self) -> String;
@@ -118,7 +118,7 @@ impl HubConnection {
                 connection_data.as_str(),
                 connection_token.as_str(),
                 protocol.as_str(),
-                Some(tx)
+                Some(tx),
             )
             .map(|r| r)
             .wait()
@@ -129,7 +129,7 @@ impl HubConnection {
             let vec = rx.recv().unwrap();
             println!("oc: chunk: {:?}", vec);
 
-            if vec.len() > 19{
+            if vec.len() > 19 {
                 use std;
                 let data = std::str::from_utf8(&vec).unwrap();
                 /*{
@@ -144,12 +144,15 @@ impl HubConnection {
                             }
                     ]
                 }*/
-                if data.contains("data:") { //we do not deal with "data:{}"
-                    let map : Map<String, Value> = serde_json::from_str(&data[5..]).unwrap();
-                    if map.contains_key(&String::from("S")) && map.get(&String::from("S")).unwrap().as_u64().unwrap() == 1u64 {
+                if data.contains("data:") {
+                    //we do not deal with "data:{}"
+                    let map: Map<String, Value> = serde_json::from_str(&data[5..]).unwrap();
+                    if map.contains_key(&String::from("S"))
+                        && map.get(&String::from("S")).unwrap().as_u64().unwrap() == 1u64
+                    {
                         //TODO abhi: initiate a 'start' request
                     }
-                    if let Some(messages) = map.get(&String::from("M")) { 
+                    if let Some(messages) = map.get(&String::from("M")) {
                         let messages = messages.as_array().unwrap();
                         for message in messages {
                             let hub = &message[&String::from("H")];

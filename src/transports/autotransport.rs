@@ -35,7 +35,7 @@ impl AutoTransport {
         connection_token: &str,
         protocol: &str,
         i: usize,
-        sender : Option<Sender<Vec<u8>>>
+        sender: Option<Sender<Vec<u8>>>,
     ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
         {
             if i < self.transports.len() {
@@ -44,7 +44,14 @@ impl AutoTransport {
                 return transport.start(url, connection_data, connection_token, protocol, sender);
             }
         }
-        self.resolve_transport(url, connection_data, connection_token, protocol, i + 1, sender)
+        self.resolve_transport(
+            url,
+            connection_data,
+            connection_token,
+            protocol,
+            i + 1,
+            sender,
+        )
     }
 }
 
@@ -68,7 +75,7 @@ impl ClientTransport for AutoTransport {
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
-        sender : Option<Sender<Vec<u8>>>
+        sender: Option<Sender<Vec<u8>>>,
     ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
         self.resolve_transport(url, connection_data, connection_token, protocol, 0, sender)
     }
