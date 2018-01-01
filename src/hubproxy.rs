@@ -38,7 +38,7 @@ impl Proxy {
     //TODO abhi: rework on moving this to an appropriate place
     pub fn on<T>(&mut self, event_name: String, f: Box<Fn(T)>) {
         let mut subscription = self.subscribe(event_name);
-        subscription.set(Box::new(|l| { /*TODO abhi check how f can be invoked*/ }));
+        subscription.set(Box::new(|l| { }));
     }
 
     //converts a Box<HubProxy> to Proxy.

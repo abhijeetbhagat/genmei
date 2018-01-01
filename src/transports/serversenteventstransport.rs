@@ -73,9 +73,14 @@ impl ServerSentEventsTransport {
                         //TODO abhi: initiate a 'start' request
                     }
                     if let Some(messages) = map.get(&String::from("M")) { 
-                        let messages = messages.as_array();
+                        let messages = messages.as_array().unwrap();
                         for message in messages {
-
+                            let hub = &message[&String::from("H")];
+                            println!("{:?}", hub);
+                            let method = &message[&String::from("M")];
+                            println!("{:?}", method);
+                            let args = &message[&String::from("A")];
+                            println!("{:?}", args);
                         }
                     }
                 }
