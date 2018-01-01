@@ -30,6 +30,7 @@ impl ServerSentEventsTransport {
         connection_token: &str,
         protocol: &str,
         map: &mut Map<String, Value>,
+        sender : Option<Sender<Vec<u8>>>
     ) {
         let url = UrlBuilder::create_connect_url(
             url,
@@ -112,9 +113,10 @@ impl ClientTransport for ServerSentEventsTransport {
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
+        sender : Option<Sender<Vec<u8>>>
     ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
         let mut map = Map::new();
-        self.open_connection(url, connection_data, connection_token, protocol, &mut map);
+        self.open_connection(url, connection_data, connection_token, protocol, &mut map, sender);
         Box::new(ok::<_, _>(map))
     }
 

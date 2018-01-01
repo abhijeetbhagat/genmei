@@ -8,6 +8,7 @@ use transports::serversenteventstransport::ServerSentEventsTransport;
 use transports::longpollingtransport::LongPollingTransport;
 use serde_json;
 use serde_json::{Map, Value};
+use std::sync::mpsc::Sender;
 
 type TransportList = Vec<Box<ClientTransport>>;
 
@@ -34,15 +35,16 @@ impl AutoTransport {
         connection_token: &str,
         protocol: &str,
         i: usize,
+        sender : Option<Sender<Vec<u8>>>
     ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
         {
             if i < self.transports.len() {
                 let transport = &mut self.transports[i];
                 //TODO abhi: check error returned from start() and try another transport
-                return transport.start(url, connection_data, connection_token, protocol);
+                return transport.start(url, connection_data, connection_token, protocol, sender);
             }
         }
-        self.resolve_transport(url, connection_data, connection_token, protocol, i + 1)
+        self.resolve_transport(url, connection_data, connection_token, protocol, i + 1, sender)
     }
 }
 
@@ -66,8 +68,9 @@ impl ClientTransport for AutoTransport {
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
+        sender : Option<Sender<Vec<u8>>>
     ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
-        self.resolve_transport(url, connection_data, connection_token, protocol, 0)
+        self.resolve_transport(url, connection_data, connection_token, protocol, 0, sender)
     }
 
 

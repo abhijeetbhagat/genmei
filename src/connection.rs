@@ -15,6 +15,7 @@ use std::ops::Deref;
 use std::rc::Rc;
 use serde_json::{Map, Value};
 use std::cell::RefCell;
+use std::sync::mpsc::{channel, Sender, Receiver};
 
 pub trait Connection {
     fn get_url(&self) -> String;
@@ -108,6 +109,7 @@ impl HubConnection {
         let protocol = self.get_protocol();
         let connection_data = self.get_connection_data();
         let connection_token = self.get_connection_token();
+        let (tx, rx) = channel();
         let response = self.client_transport
             .as_mut()
             .unwrap()
@@ -116,6 +118,7 @@ impl HubConnection {
                 connection_data.as_str(),
                 connection_token.as_str(),
                 protocol.as_str(),
+                Some(tx)
             )
             .map(|r| r)
             .wait()

@@ -5,6 +5,7 @@ use httpclient::HttpClient;
 use urlbuilder::UrlBuilder;
 use connection::Connection;
 use serde_json::{Map, Value};
+use std::sync::mpsc::Sender;
 
 pub struct LongPollingTransport;
 
@@ -24,6 +25,7 @@ impl ClientTransport for LongPollingTransport {
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
+        sender : Option<Sender<Vec<u8>>>
     ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
         unimplemented!();
         //let url = UrlBuilder::create_connect_url(url, conn)
