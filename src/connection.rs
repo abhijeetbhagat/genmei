@@ -155,8 +155,12 @@ impl HubConnection {
                     if let Some(messages) = map.get(&String::from("M")) {
                         let messages = messages.as_array().unwrap();
                         for message in messages {
-                            let hub = &message[&String::from("H")];
+                            let &serde_json::Value::String(hub) = &message[&String::from("H")];
                             println!("{:?}", hub);
+                            if self.proxies_map.contains_key(&hub) {
+                                let proxy = self.proxies_map[&hub];
+                                proxy.borrow().handle_message(&hub);
+                            }
                             let method = &message[&String::from("M")];
                             println!("{:?}", method);
                             let args = &message[&String::from("A")];
@@ -165,7 +169,7 @@ impl HubConnection {
                     }
                 }
             }
-        }
+        } //loop ends
     }
 
     fn process_response(&mut self, response: Map<String, Value>) {

@@ -15,7 +15,7 @@ impl Subscription {
         self.received = Some(f);
     }
 
-    fn on_received(&self, items: Vec<Value>) {
+    pub fn on_received(&self, items: Vec<Value>) {
         if self.received.is_some() {
             (self.received.as_ref().unwrap())(items);
         }

@@ -40,14 +40,13 @@ impl ServerSentEventsTransport {
             protocol,
         );
 
-        let (tx, rx) = mpsc::channel();
         let response = self.http_client.get_stream(
             &url,
             Some(vec![
                 ("Accept", "text/event-stream"),
                 ("User-Agent", "genmei"),
             ]),
-            tx,
+            sender.unwrap(),
         );
         //ServerSentEventsTransport::process_response(response)
     }

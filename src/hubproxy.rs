@@ -38,7 +38,14 @@ impl Proxy {
     //TODO abhi: rework on moving this to an appropriate place
     pub fn on<T>(&mut self, event_name: String, f: Box<Fn(T)>) {
         let mut subscription = self.subscribe(event_name);
-        subscription.set(Box::new(|l| {}));
+        subscription.set(Box::new(|l| {
+            println!("callback invoked");
+        }));
+    }
+
+    pub fn handle_message(&self, event_name: &String) {
+        let subscription = self.subscriptions.get(event_name);
+        subscription.unwrap().on_received(vec![]);
     }
 
     //converts a Box<HubProxy> to Proxy.
