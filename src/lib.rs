@@ -79,7 +79,7 @@ mod tests {
 
         let mut proxy = connection.create_hub_proxy(String::from("MyHub"));
         //TODO abhi: we can do better (using abstractions?) than calling methods like this:
-        //(*proxy.borrow_mut()).on::<String>(String::from("send"), Box::new(|s|{}));
+        (*proxy.borrow_mut()).on::<String>(String::from("send"), Box::new(|s| {}));
         //(*proxy.borrow_mut()).invoke(String::from("send"), vec![&String::from("abhi"), &1]);
 
         connection.start().wait();
