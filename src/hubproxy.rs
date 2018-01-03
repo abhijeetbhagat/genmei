@@ -1,13 +1,15 @@
+use std;
 use std::any::Any;
 use futures::prelude::*;
 //use futures::future::Future;
 use connection::{Connection, HubConnection};
 use message::{InvocationMessage, Message};
-use serde_json::Value;
+use serde_json::{self, Value};
 use erased_serde::Serialize;
 use subscription::Subscription;
 use std::collections::HashMap;
 use httpclient::HttpClient;
+use serde;
 
 /* Due to E0038, we aren't using this trait
  * TODO abhi: need to revisit if necessary
@@ -36,10 +38,22 @@ impl Proxy {
     //not part of HubProxy because it would cause E0038
     //this will now make the api usage awkward since the trait object now needs a downcast
     //TODO abhi: rework on moving this to an appropriate place
-    pub fn on<T>(&mut self, event_name: String, f: Box<Fn(T)>) {
+    pub fn on_1_arg<T>(&mut self, event_name: String, f: Box<Fn(T)>)
+    where
+        T: 'static + serde::de::DeserializeOwned,
+    {
         let mut subscription = self.subscribe(event_name);
-        subscription.set(Box::new(|l| {
+        subscription.set(Box::new(move |mut l| {
             println!("callback invoked with args {}", l[0]);
+            let v = std::mem::replace(&mut l[0], serde_json::json!(0));
+            f(serde_json::from_value(v).unwrap());
+        }));
+    }
+
+    pub fn on(&mut self, event_name: String, f: Box<Fn()>) {
+        let mut subscription = self.subscribe(event_name);
+        subscription.set(Box::new(move |l| {
+            f();
         }));
     }
 

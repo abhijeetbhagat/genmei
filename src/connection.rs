@@ -152,6 +152,7 @@ impl HubConnection {
                     {
                         //TODO abhi: initiate a 'start' request
                     }
+                    //TODO abhi: this whole thing needs to be re-written
                     if let Some(messages) = map.remove(&String::from("M")) {
                         let messages = messages.as_array().unwrap();
                         for mut message in messages {
