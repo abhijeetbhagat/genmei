@@ -146,15 +146,15 @@ impl HubConnection {
                 }*/
                 if data.contains("data:") {
                     //we do not deal with "data:{}"
-                    let map: Map<String, Value> = serde_json::from_str(&data[5..]).unwrap();
+                    let mut map: Map<String, Value> = serde_json::from_str(&data[5..]).unwrap();
                     if map.contains_key(&String::from("S"))
                         && map.get(&String::from("S")).unwrap().as_u64().unwrap() == 1u64
                     {
                         //TODO abhi: initiate a 'start' request
                     }
-                    if let Some(messages) = map.get(&String::from("M")) {
+                    if let Some(messages) = map.remove(&String::from("M")) {
                         let messages = messages.as_array().unwrap();
-                        for message in messages {
+                        for mut message in messages {
                             let hub = message[&String::from("H")].as_str().unwrap();
                             println!("{:?}", hub);
                             let hub = &String::from(hub);
@@ -165,7 +165,9 @@ impl HubConnection {
                                 println!("{:?}", method);
                                 let args = &message[&String::from("A")];
                                 println!("{:?}", args);
-                                proxy.borrow().handle_message(method);
+                                proxy
+                                    .borrow()
+                                    .handle_message(method, args.as_array().unwrap().clone());
                             }
                         }
                     }
