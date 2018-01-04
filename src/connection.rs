@@ -15,7 +15,7 @@ use std::ops::Deref;
 use std::rc::Rc;
 use serde_json::{Map, Value};
 use std::cell::RefCell;
-use std::sync::mpsc::{channel, Receiver, Sender};
+use std::sync::mpsc::channel;
 
 pub trait Connection {
     fn get_url(&self) -> String;

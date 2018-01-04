@@ -33,7 +33,7 @@ unsafe impl Sync for DefaultHttpClient {}
 
 impl DefaultHttpClient {
     pub fn new() -> Self {
-        let mut core = Core::new().unwrap();
+        let core = Core::new().unwrap();
         let client = Client::new(&core.handle());
 
         DefaultHttpClient { client, core }
