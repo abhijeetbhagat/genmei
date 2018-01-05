@@ -40,8 +40,6 @@ pub struct HubConnection {
     query_string_map: HashMap<String, String>,
     callbacks_map: HashMap<String, fn(HubResult)>,
     proxies_map: HashMap<String, Rc<RefCell<Proxy>>>,
-    //TODO abhi: remove this field after proxies_map is used
-    hub_name: String,
     pub headers: HashMap<String, String>,
     on_received: Option<Box<Fn(String)>>,
     on_closed: Option<Box<Fn(String)>>,
@@ -295,7 +293,6 @@ impl HubConnectionBuilder {
             query_string: self.query_string.unwrap_or(String::from("")),
             query_string_map: self.query_string_map.unwrap_or(HashMap::new()),
             callbacks_map: HashMap::new(),
-            hub_name: String::new(),
             proxies_map: HashMap::new(),
             headers: HashMap::new(),
             on_received: None,
