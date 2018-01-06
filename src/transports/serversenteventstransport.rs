@@ -57,6 +57,10 @@ impl ServerSentEventsTransport {
 }
 
 impl ClientTransport for ServerSentEventsTransport {
+    fn name(&self) -> &str {
+        "serverSentEvents"
+    }
+
     fn negotiate(
         &mut self,
         url: &str,
@@ -88,14 +92,15 @@ impl ClientTransport for ServerSentEventsTransport {
 
 
     fn send(
-        &self,
+        &mut self,
         url: &str,
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
         data: String,
     ) -> Box<Future<Item = (), Error = ()>> {
-        unimplemented!();
+        self.http_client.post(url, data);
+        Box::new(ok::<_, _>(()))
     }
 
     fn abort(&self) -> Box<Future<Item = (), Error = ()>> {

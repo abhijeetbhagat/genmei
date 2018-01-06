@@ -10,6 +10,11 @@ use std::sync::mpsc::Sender;
 pub struct LongPollingTransport;
 
 impl ClientTransport for LongPollingTransport {
+    fn name(&self) -> &str {
+        //TODO abhi: find the longpoling string and use it here
+        ""
+    }
+
     fn negotiate(
         &mut self,
         url: &str,
@@ -32,7 +37,7 @@ impl ClientTransport for LongPollingTransport {
     }
 
     fn send(
-        &self,
+        &mut self,
         url: &str,
         connection_data: &str,
         connection_token: &str,
