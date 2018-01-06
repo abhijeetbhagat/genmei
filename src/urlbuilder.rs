@@ -89,4 +89,21 @@ impl UrlBuilder {
             protocol,
         )
     }
+
+    pub fn create_send_url(
+        url: &str,
+        transport: Option<&str>,
+        connection_data: &str,
+        connection_token: Option<&str>,
+        protocol: &str,
+    ) -> String {
+        UrlBuilder::create_base_url(
+            url,
+            "send",
+            transport,
+            connection_data,
+            connection_token,
+            protocol,
+        )
+    }
 }
