@@ -20,7 +20,7 @@ pub type OptionalRawHeaders = Option<Vec<(&'static str, &'static str)>>;
 pub trait HttpClient {
     fn get(&mut self, url: &str, headers: OptionalRawHeaders) -> String;
     fn get_stream(&mut self, url: &str, headers: OptionalRawHeaders, transmitter: Sender<Vec<u8>>);
-    fn post(&self) -> Response;
+    fn post(&mut self, url: &str, data: String);
 }
 
 pub struct DefaultHttpClient {
@@ -89,7 +89,10 @@ impl HttpClient for DefaultHttpClient {
         //self.core.run(work);
     }
 
-    fn post(&self) -> Response {
-        unimplemented!();
+    fn post(&mut self, url: &str, data: String) {
+        let mut request = Request::new(Method::Post, url.parse().unwrap());
+        request.set_body(data);
+        let work = self.client.request(request);
+        self.core.run(work);
     }
 }
