@@ -11,6 +11,7 @@ use serde;
 use std::thread;
 use std::marker::{Send, Sync};
 use std::sync::Arc;
+use connection::Connection;
 
 /* Due to E0038, we aren't using this trait
  * TODO abhi: need to revisit if necessary
@@ -273,10 +274,9 @@ impl Proxy {
         a.downcast_ref::<Self>().unwrap()
     }*/
 
-    pub fn invoke(&self, method: String, args: Vec<&Serialize>) /*-> Box<Future<Item=(), Error=()>>*/
+    pub fn invoke(&self, method: String, args: Vec<&Serialize>, conn: &mut Connection)
+    /*-> Box<Future<Item=(), Error=()>>*/
     {
-        //TODO abhi : remove macro after implementation
-        unimplemented!();
         let mut _args = vec![];
         for a in args {
             _args.push(json!(a));
@@ -289,8 +289,8 @@ impl Proxy {
             args: _args,
         };
 
-        //let data = self.connection.json_serialize(&message);
-        //self.connection.send (data);
+        let data = conn.json_serialize(&message);
+        conn.send(data);
     }
 
     pub fn subscribe(&mut self, event: String) -> &mut Subscription {
