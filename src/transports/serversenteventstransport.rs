@@ -87,7 +87,14 @@ impl ClientTransport for ServerSentEventsTransport {
     }
 
 
-    fn send(&self) -> Box<Future<Item = (), Error = ()>> {
+    fn send(
+        &self,
+        url: &str,
+        connection_data: &str,
+        connection_token: &str,
+        protocol: &str,
+        data: String,
+    ) -> Box<Future<Item = (), Error = ()>> {
         unimplemented!();
     }
 

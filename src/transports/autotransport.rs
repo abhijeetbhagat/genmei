@@ -81,8 +81,15 @@ impl ClientTransport for AutoTransport {
     }
 
 
-    fn send(&self) -> Box<Future<Item = (), Error = ()>> {
-        unimplemented!();
+    fn send(
+        &self,
+        url: &str,
+        connection_data: &str,
+        connection_token: &str,
+        protocol: &str,
+        data: String,
+    ) -> Box<Future<Item = (), Error = ()>> {
+        Box::new(ok::<_, _>(()))
     }
 
     fn abort(&self) -> Box<Future<Item = (), Error = ()>> {
