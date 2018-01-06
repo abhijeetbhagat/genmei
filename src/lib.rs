@@ -83,7 +83,11 @@ mod tests {
             String::from("send"),
             Box::new(|s| println!("The real callback says: {}", s)),
         );
-        //(*proxy.borrow_mut()).invoke(String::from("send"), vec![&String::from("abhi"), &1]);
+        (*proxy.borrow_mut()).invoke(
+            String::from("send"),
+            vec![&String::from("abhi"), &1],
+            &mut connection,
+        );
 
         connection.start().wait();
     }
@@ -220,5 +224,10 @@ mod tests {
         loop {
             println!("recv chunk {:?}", rx.recv().unwrap());
         }
+    }
+
+    #[test]
+    fn test_send_url_create() {
+        assert_eq!(UrlBuilder::create_send_url("http://localhost:8080", Some("serverSentEvents"), "abc", Some("xyz"), "1.4"), String::from("http://localhost:8080/send?clientProtocol=1.4&transport=serverSentEvents&connectionData=abc&connectionToken=xyz"));
     }
 }
