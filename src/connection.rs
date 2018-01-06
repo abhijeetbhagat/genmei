@@ -1,7 +1,8 @@
 use hubproxy::Proxy;
 use hubresult::HubResult;
 use std::collections::HashMap;
-use serde::ser::Serialize;
+use erased_serde::Serialize;
+use serde;
 use serde_json;
 use serde_json::Result;
 use futures::future::*;
@@ -24,7 +25,7 @@ pub trait Connection {
     fn get_protocol(&self) -> String;
     fn json_serialize(&self, &InvocationMessage) -> String;
     fn get_transport(&self) -> &ClientTransport;
-    fn send(&self, data: String);
+    fn send(&mut self, data: String);
     fn start(&mut self) -> Box<Future<Item = (), Error = ()>>;
 }
 
@@ -74,7 +75,7 @@ impl HubConnection {
         unimplemented!();
     }*/
 
-    pub fn json_serialize_object<T: Serialize>(&self, object: &T) -> Result<String> {
+    pub fn json_serialize_object<T: serde::Serialize>(&self, object: &T) -> Result<String> {
         serde_json::to_string(object)
     }
 
@@ -210,7 +211,19 @@ impl Connection for HubConnection {
         self.json_serialize_object(message).unwrap()
     }
 
-    fn send(&self, data: String) {}
+    fn send(&mut self, data: String) {
+        let url = self.get_url();
+        let protocol = self.get_protocol();
+        let connection_data = self.get_connection_data();
+        let connection_token = self.get_connection_token();
+        self.client_transport.as_mut().unwrap().send(
+            url.as_str(),
+            connection_data.as_str(),
+            connection_token.as_str(),
+            protocol.as_str(),
+            data,
+        );
+    }
 
     fn get_transport(&self) -> &ClientTransport {
         self.client_transport.as_ref().unwrap().deref()
