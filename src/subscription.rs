@@ -1,9 +1,10 @@
 use serde_json::Value;
 use std::option::Option;
+use std::marker::{Send, Sync};
 
 pub struct Subscription {
     //TODO should accept an iterator and not vec so that any iterable can be passed
-    received: Option<Box<Fn(Vec<Value>)>>,
+    received: Option<Box<Fn(Vec<Value>) + Send + Sync>>,
 }
 
 impl Subscription {
@@ -11,7 +12,7 @@ impl Subscription {
         Subscription { received: None }
     }
 
-    pub fn set(&mut self, f: Box<Fn(Vec<Value>)>) {
+    pub fn set(&mut self, f: Box<Fn(Vec<Value>) + Send + Sync>) {
         self.received = Some(f);
     }
 

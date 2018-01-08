@@ -37,7 +37,7 @@ impl Proxy {
         }
     }
 
-    pub fn on(&mut self, event_name: String, f: Box<Fn()>) {
+    pub fn on(&mut self, event_name: String, f: Box<Fn() + Send + Sync>) {
         let mut subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |l| {
             f();

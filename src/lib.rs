@@ -71,7 +71,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_connection_create() {
         let mut connection = HubConnectionBuilder::new(String::from(
             "http://localhost:8080/signalr",
@@ -80,17 +79,19 @@ mod tests {
 
         let mut proxy = connection.create_hub_proxy(String::from("MyHub"));
         //TODO abhi: we can do better (using abstractions?) than calling methods like this:
-        (*proxy.borrow_mut()).on_1_arg::<String>(
+        proxy.lock().unwrap().on_1_arg::<String>(
             String::from("send"),
             Box::new(|s| println!("The real callback says: {}", s)),
         );
-        (*proxy.borrow_mut()).invoke(
+        /*proxy.lock().unwrap().invoke(
             String::from("send"),
             vec![&String::from("abhi"), &1],
             &mut connection,
-        );
+        );*/
 
         connection.start().wait();
+        println!("connection started");
+        loop{}
     }
 
     #[test]
@@ -241,11 +242,11 @@ mod tests {
 
         let mut proxy = connection.create_hub_proxy(String::from("MyHub"));
         //TODO abhi: we can do better (using abstractions?) than calling methods like this:
-        (*proxy.borrow_mut()).on_1_arg::<String>(
+        proxy.lock().unwrap().on_1_arg::<String>(
             String::from("send"),
             Box::new(|s| println!("The real callback says: {}", s)),
         );
-        (*proxy.borrow_mut()).invoke(
+        proxy.lock().unwrap().invoke(
             String::from("send"),
             vec![&String::from("abhi"), &1],
             &mut connection,

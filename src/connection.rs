@@ -13,10 +13,10 @@ use transports::clienttransport::ClientTransport;
 use transports::autotransport::AutoTransport;
 use httpclient::DefaultHttpClient;
 use std::ops::Deref;
-use std::rc::Rc;
 use serde_json::{Map, Value};
-use std::cell::RefCell;
 use std::sync::mpsc::channel;
+use std::sync::{Arc, Mutex};
+use std::thread::{self, JoinHandle};
 
 pub trait Connection {
     fn get_url(&self) -> String;
@@ -40,7 +40,7 @@ pub struct HubConnection {
     query_string: String,
     query_string_map: HashMap<String, String>,
     callbacks_map: HashMap<String, fn(HubResult)>,
-    proxies_map: HashMap<String, Rc<RefCell<Proxy>>>,
+    proxies_map: HashMap<String, Arc<Mutex<Proxy>>>,
     pub headers: HashMap<String, String>,
     on_received: Option<Box<Fn(String)>>,
     on_closed: Option<Box<Fn(String)>>,
@@ -62,12 +62,12 @@ impl HubConnection {
         }
     }*/
 
-    pub fn create_hub_proxy(&mut self, hub_name: String) -> Rc<RefCell<Proxy>> {
+    pub fn create_hub_proxy(&mut self, hub_name: String) -> Arc<Mutex<Proxy>> {
         //self.hub_name = hub_name.clone();
         let proxy = Proxy::new(/*self,*/ hub_name.clone());
         self.proxies_map
-            .insert(hub_name.clone(), Rc::new(RefCell::new(proxy)));
-        Rc::clone(self.proxies_map.get(&hub_name).unwrap())
+            .insert(hub_name.clone(), Arc::new(Mutex::new(proxy)));
+        Arc::clone(self.proxies_map.get(&hub_name).unwrap())
     }
 
     /*pub fn start<T, E> (&self) -> FutureResult<T, E> {
@@ -103,7 +103,7 @@ impl HubConnection {
         self.on_statechanged = Some(handler);
     }
 
-    fn start_transport(&mut self) {
+    fn start_transport(&mut self) -> JoinHandle<()> {
         let url = self.get_url();
         let protocol = self.get_protocol();
         let connection_data = self.get_connection_data();
@@ -123,57 +123,61 @@ impl HubConnection {
             .wait()
             .unwrap();
 
+        let pm = self.proxies_map.clone();
         //self.process_response(response);
-        loop {
-            let vec = rx.recv().unwrap();
-            println!("oc: chunk: {:?}", vec);
+        thread::spawn(move || {
+            loop {
+                let vec = rx.recv().unwrap();
+                println!("oc: chunk: {:?}", vec);
 
-            if vec.len() > 19 {
-                use std;
-                let data = std::str::from_utf8(&vec).unwrap();
-                /*{
-                    "C": "d-A2D08C-B,1|C,0|D,1",
-                    "M": [
-                            {
-                            "H": "MyHub",
-                            "M": "send",
-                            "A": [
-                            "client message"
-                            ]
-                            }
-                    ]
-                }*/
-                if data.contains("data:") {
-                    //we do not deal with "data:{}"
-                    let mut map: Map<String, Value> = serde_json::from_str(&data[5..]).unwrap();
-                    if map.contains_key(&String::from("S"))
-                        && map.get(&String::from("S")).unwrap().as_u64().unwrap() == 1u64
-                    {
-                        //TODO abhi: initiate a 'start' request
-                    }
-                    //TODO abhi: this whole thing needs to be re-written
-                    if let Some(messages) = map.remove(&String::from("M")) {
-                        let messages = messages.as_array().unwrap();
-                        for mut message in messages {
-                            let hub = message[&String::from("H")].as_str().unwrap();
-                            println!("{:?}", hub);
-                            let hub = &String::from(hub);
-                            if self.proxies_map.contains_key(hub) {
-                                let proxy = &self.proxies_map[hub];
-                                let method = message[&String::from("M")].as_str().unwrap();
-                                let method = &String::from(method);
-                                println!("{:?}", method);
-                                let args = &message[&String::from("A")];
-                                println!("{:?}", args);
-                                proxy
-                                    .borrow()
-                                    .handle_message(method, args.as_array().unwrap().clone());
+                if vec.len() > 19 {
+                    use std;
+                    let data = std::str::from_utf8(&vec).unwrap();
+                    /*{
+                      "C": "d-A2D08C-B,1|C,0|D,1",
+                      "M": [
+                      {
+                      "H": "MyHub",
+                      "M": "send",
+                      "A": [
+                      "client message"
+                      ]
+                      }
+                      ]
+                      }*/
+                    if data.contains("data:") {
+                        //we do not deal with "data:{}"
+                        let mut map: Map<String, Value> = serde_json::from_str(&data[5..]).unwrap();
+                        if map.contains_key(&String::from("S"))
+                            && map.get(&String::from("S")).unwrap().as_u64().unwrap() == 1u64
+                        {
+                            //TODO abhi: initiate a 'start' request
+                        }
+                        //TODO abhi: this whole thing needs to be re-written
+                        if let Some(messages) = map.remove(&String::from("M")) {
+                            let messages = messages.as_array().unwrap();
+                            for mut message in messages {
+                                let hub = message[&String::from("H")].as_str().unwrap();
+                                println!("{:?}", hub);
+                                let hub = &String::from(hub);
+                                if pm.contains_key(hub) {
+                                    let proxy = &pm[hub];
+                                    let method = message[&String::from("M")].as_str().unwrap();
+                                    let method = &String::from(method);
+                                    println!("{:?}", method);
+                                    let args = &message[&String::from("A")];
+                                    println!("{:?}", args);
+                                    proxy
+                                        .lock()
+                                        .unwrap()
+                                        .handle_message(method, args.as_array().unwrap().clone());
+                                }
                             }
                         }
                     }
                 }
-            }
-        } //loop ends
+            } //loop ends
+        })
     }
 
     fn process_response(&mut self, response: Map<String, Value>) {
@@ -182,6 +186,8 @@ impl HubConnection {
             println!("{}", response.get(&String::from("I")).unwrap());
         }
     }
+
+    //fn init(&mut self)
 }
 
 impl Connection for HubConnection {
@@ -237,12 +243,12 @@ impl Connection for HubConnection {
             .as_mut()
             .unwrap()
             .negotiate(url.as_str(), connection_data.as_str(), protocol.as_str())
-            .map(|r| {
+            .and_then(|r| {
                 self.connection_token = r.connection_token;
                 self.connection_id = r.connection_id;
-                self.start_transport()
-            })
-            .wait(); //TODO abhi: remove wait(); this is called only for testing
+                self.start_transport().join();
+                Box::new(result(Ok(())))
+            });
         Box::new(result(Ok(())))
         /*Box::new(self.client_transport.as_mut().unwrap().negotiate().map(|response|{
             self.connection_token = response.connection_token;
