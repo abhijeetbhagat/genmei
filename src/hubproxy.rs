@@ -274,9 +274,12 @@ impl Proxy {
         a.downcast_ref::<Self>().unwrap()
     }*/
 
-    pub fn invoke(&self, method: String, args: Vec<&Serialize>, conn: &mut Connection)
-    /*-> Box<Future<Item=(), Error=()>>*/
-    {
+    pub fn invoke(
+        &self,
+        method: String,
+        args: Vec<&Serialize>,
+        conn: &mut Connection,
+    ) -> Box<Future<Item = (), Error = ()>> {
         let mut _args = vec![];
         for a in args {
             _args.push(json!(a));
@@ -290,7 +293,24 @@ impl Proxy {
         };
 
         let data = conn.json_serialize(&message);
-        conn.send(data);
+        let mut _data = String::new();
+        _data.push_str("data=");
+        for c in data.chars() {
+            match c {
+                '{' => _data.push_str("%7b"),
+                '}' => _data.push_str("%7d"),
+                '"' => _data.push_str("%22"),
+                ':' => _data.push_str("%3a"),
+                ',' => _data.push_str("%2c"),
+                '[' => _data.push_str("%5b"),
+                ']' => _data.push_str("%5d"),
+                '/' => _data.push_str("%2F"),
+                '+' => _data.push_str("%2B"),
+                '=' => _data.push_str("%3D"),
+                _ => _data.push(c),
+            }
+        }
+        conn.send(_data)
     }
 
     pub fn subscribe(&mut self, event: String) -> &mut Subscription {
