@@ -12,6 +12,7 @@ use std::thread;
 use std::marker::{Send, Sync};
 use std::sync::Arc;
 use connection::Connection;
+use futures::future;
 
 /* Due to E0038, we aren't using this trait
  * TODO abhi: need to revisit if necessary
@@ -310,7 +311,8 @@ impl Proxy {
                 _ => _data.push(c),
             }
         }
-        conn.send(_data)
+        conn.send(_data);
+        Box::new(future::ok::<_, _>(()))
     }
 
     pub fn subscribe(&mut self, event: String) -> &mut Subscription {
