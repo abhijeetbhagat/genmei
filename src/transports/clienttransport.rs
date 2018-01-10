@@ -19,7 +19,7 @@ pub trait ClientTransport {
         connection_token: &str,
         protocol: &str,
         sender: Option<Sender<Vec<u8>>>,
-    ) -> Box<Future<Item = Map<String, Value>, Error = ()>>;
+    ) -> Box<Future<Item = (), Error = ()>>;
     fn send(
         &mut self,
         url: &str,

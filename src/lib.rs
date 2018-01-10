@@ -83,15 +83,21 @@ mod tests {
             String::from("send"),
             Box::new(|s| println!("The real callback says: {}", s)),
         );
-        /*proxy.lock().unwrap().invoke(
-            String::from("send"),
-            vec![&String::from("abhi"), &1],
-            &mut connection,
-        );*/
 
         connection.start().wait();
         println!("connection started");
-        loop{}
+        proxy
+            .lock()
+            .unwrap()
+            .invoke(
+                String::from("send"),
+                vec![&String::from("abhi"), &1],
+                &mut connection,
+            )
+            .wait()
+            .unwrap();
+        use std::{thread, time};
+        thread::sleep(time::Duration::from_millis(5000));
     }
 
     #[test]

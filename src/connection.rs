@@ -246,9 +246,10 @@ impl Connection for HubConnection {
             .and_then(|r| {
                 self.connection_token = r.connection_token;
                 self.connection_id = r.connection_id;
-                self.start_transport().join();
                 Box::new(result(Ok(())))
-            });
+            })
+            .wait();
+        self.start_transport();
         Box::new(result(Ok(())))
         /*Box::new(self.client_transport.as_mut().unwrap().negotiate().map(|response|{
             self.connection_token = response.connection_token;

@@ -27,7 +27,6 @@ impl ServerSentEventsTransport {
         connection_data: &str,
         connection_token: &str,
         protocol: &str,
-        map: &mut Map<String, Value>,
         sender: Option<Sender<Vec<u8>>>,
     ) {
         let url = UrlBuilder::create_connect_url(
@@ -38,7 +37,7 @@ impl ServerSentEventsTransport {
             protocol,
         );
 
-        let response = self.http_client.get_stream(
+        self.http_client.get_stream(
             &url,
             Some(vec![
                 ("Accept", "text/event-stream"),
@@ -77,17 +76,9 @@ impl ClientTransport for ServerSentEventsTransport {
         connection_token: &str,
         protocol: &str,
         sender: Option<Sender<Vec<u8>>>,
-    ) -> Box<Future<Item = Map<String, Value>, Error = ()>> {
-        let mut map = Map::new();
-        self.open_connection(
-            url,
-            connection_data,
-            connection_token,
-            protocol,
-            &mut map,
-            sender,
-        );
-        Box::new(ok::<_, _>(map))
+    ) -> Box<Future<Item = (), Error = ()>> {
+        self.open_connection(url, connection_data, connection_token, protocol, sender);
+        Box::new(ok::<_, _>(()))
     }
 
 
