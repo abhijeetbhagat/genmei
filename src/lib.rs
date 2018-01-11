@@ -91,7 +91,7 @@ mod tests {
             .unwrap()
             .invoke(
                 String::from("send"),
-                vec![&String::from("abhi"), &1],
+                vec![&String::from("abhi")],
                 &mut connection,
             )
             .wait()
