@@ -86,7 +86,7 @@ impl HttpClient for DefaultHttpClient {
             core.run(work);
         });
         use std::{thread, time};
-        thread::sleep(time::Duration::from_millis(500));
+        //thread::sleep(time::Duration::from_millis(500));
         //TODO abhi: work should not be run here
         //self.core.run(work);
     }
@@ -94,13 +94,13 @@ impl HttpClient for DefaultHttpClient {
     fn post(&mut self, url: &str, data: String) {
         let mut request = Request::new(Method::Post, url.parse().unwrap());
         request.set_body(data);
-        let work = self.client.request(request).map(|r|{ 
-            r.body().map(|chunk|{ 
+        let work = self.client.request(request).and_then(|r|{ 
+            r.body().for_each(|chunk|{ 
                 println!("post - {:?}", chunk);
                 future::ok::<_,Error>(())
             })
         });
-        self.core.run(work);
-        thread::sleep(time::Duration::from_millis(2000));
+        self.core.run(work).unwrap();
+        //thread::sleep(time::Duration::from_millis(2000));
     }
 }

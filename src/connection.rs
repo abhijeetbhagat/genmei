@@ -158,15 +158,15 @@ impl HubConnection {
                             let messages = messages.as_array().unwrap();
                             for mut message in messages {
                                 let hub = message[&String::from("H")].as_str().unwrap();
-                                println!("{:?}", hub);
+                                //println!("{:?}", hub);
                                 let hub = &String::from(hub);
                                 if pm.contains_key(hub) {
                                     let proxy = &pm[hub];
                                     let method = message[&String::from("M")].as_str().unwrap();
                                     let method = &String::from(method);
-                                    println!("{:?}", method);
+                                    //println!("{:?}", method);
                                     let args = &message[&String::from("A")];
-                                    println!("{:?}", args);
+                                    //println!("{:?}", args);
                                     proxy
                                         .lock()
                                         .unwrap()

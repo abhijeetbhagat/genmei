@@ -61,7 +61,7 @@ impl Proxy {
         let f_clone = Arc::new(f);
         let mut subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
-            println!("callback invoked with args {}", l[0]);
+            //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
             let v = std::mem::replace(&mut l[0], serde_json::json!(0));
             let f = f_clone.clone();
@@ -79,7 +79,7 @@ impl Proxy {
         let f_clone = Arc::new(f);
         let mut subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
-            println!("callback invoked with args {}", l[0]);
+            //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
             let v1 = std::mem::replace(&mut l[0], serde_json::json!(0));
             let v2 = std::mem::replace(&mut l[1], serde_json::json!(0));
@@ -105,7 +105,7 @@ impl Proxy {
         let f_clone = Arc::new(f);
         let mut subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
-            println!("callback invoked with args {}", l[0]);
+            //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
             let v1 = std::mem::replace(&mut l[0], serde_json::json!(0));
             let v2 = std::mem::replace(&mut l[1], serde_json::json!(0));
@@ -134,7 +134,7 @@ impl Proxy {
         let f_clone = Arc::new(f);
         let mut subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
-            println!("callback invoked with args {}", l[0]);
+            //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
             let v1 = std::mem::replace(&mut l[0], serde_json::json!(0));
             let v2 = std::mem::replace(&mut l[1], serde_json::json!(0));
@@ -166,7 +166,7 @@ impl Proxy {
         let f_clone = Arc::new(f);
         let mut subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
-            println!("callback invoked with args {}", l[0]);
+            //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
             let v1 = std::mem::replace(&mut l[0], serde_json::json!(0));
             let v2 = std::mem::replace(&mut l[1], serde_json::json!(0));
@@ -201,7 +201,7 @@ impl Proxy {
         let f_clone = Arc::new(f);
         let mut subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
-            println!("callback invoked with args {}", l[0]);
+            //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
             let v1 = std::mem::replace(&mut l[0], serde_json::json!(0));
             let v2 = std::mem::replace(&mut l[1], serde_json::json!(0));
@@ -239,7 +239,7 @@ impl Proxy {
         let f_clone = Arc::new(f);
         let mut subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
-            println!("callback invoked with args {}", l[0]);
+            //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
             let v1 = std::mem::replace(&mut l[0], serde_json::json!(0));
             let v2 = std::mem::replace(&mut l[1], serde_json::json!(0));
