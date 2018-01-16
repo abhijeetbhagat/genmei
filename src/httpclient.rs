@@ -20,7 +20,7 @@ pub type OptionalRawHeaders = Option<Vec<(&'static str, &'static str)>>;
 pub trait HttpClient {
     fn get(&mut self, url: &str, headers: OptionalRawHeaders) -> String;
     fn get_stream(&mut self, url: &str, headers: OptionalRawHeaders, transmitter: Sender<Vec<u8>>);
-    fn post(&mut self, url: &str, data: String);
+    fn post(&mut self, url: &str, data: String) -> Box<Future<Item=Vec<u8>, Error=()>>;
 }
 
 pub struct DefaultHttpClient {
@@ -91,16 +91,17 @@ impl HttpClient for DefaultHttpClient {
         //self.core.run(work);
     }
 
-    fn post(&mut self, url: &str, data: String) {
+    fn post(&mut self, url: &str, data: String) -> Box<Future<Item=Vec<u8>, Error=()>>{
         let mut request = Request::new(Method::Post, url.parse().unwrap());
         request.set_body(data);
-        let work = self.client.request(request).and_then(|r|{ 
-            r.body().for_each(|chunk|{ 
+        let work = self.client.request(request).map(|r|{ 
+            r.body().and_then(|chunk|{ 
                 println!("post - {:?}", chunk);
-                future::ok::<_,Error>(())
+                future::ok::<_,_>(chunk.to_vec())
             })
         });
-        self.core.run(work).unwrap();
+        //self.core.run(work).unwrap()
         //thread::sleep(time::Duration::from_millis(2000));
+        Box::new(future::ok::<_, _>(vec![]))
     }
 }
