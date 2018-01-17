@@ -39,7 +39,7 @@ impl Proxy {
     }
 
     pub fn on(&mut self, event_name: String, f: Box<Fn() + Send + Sync>) {
-        let mut subscription = self.subscribe(event_name);
+        let subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |l| {
             f();
         }));
@@ -59,7 +59,7 @@ impl Proxy {
         //subsequent invocations of the outer closure.
         //Therefore, we use an `Arc` to clone it.
         let f_clone = Arc::new(f);
-        let mut subscription = self.subscribe(event_name);
+        let subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
             //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
@@ -77,7 +77,7 @@ impl Proxy {
         T2: 'static + serde::de::DeserializeOwned,
     {
         let f_clone = Arc::new(f);
-        let mut subscription = self.subscribe(event_name);
+        let subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
             //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
@@ -103,7 +103,7 @@ impl Proxy {
         T3: 'static + serde::de::DeserializeOwned,
     {
         let f_clone = Arc::new(f);
-        let mut subscription = self.subscribe(event_name);
+        let subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
             //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
@@ -132,7 +132,7 @@ impl Proxy {
         T4: 'static + serde::de::DeserializeOwned,
     {
         let f_clone = Arc::new(f);
-        let mut subscription = self.subscribe(event_name);
+        let subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
             //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
@@ -164,7 +164,7 @@ impl Proxy {
         T5: 'static + serde::de::DeserializeOwned,
     {
         let f_clone = Arc::new(f);
-        let mut subscription = self.subscribe(event_name);
+        let subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
             //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
@@ -199,7 +199,7 @@ impl Proxy {
         T6: 'static + serde::de::DeserializeOwned,
     {
         let f_clone = Arc::new(f);
-        let mut subscription = self.subscribe(event_name);
+        let subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
             //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
@@ -237,7 +237,7 @@ impl Proxy {
         T7: 'static + serde::de::DeserializeOwned,
     {
         let f_clone = Arc::new(f);
-        let mut subscription = self.subscribe(event_name);
+        let subscription = self.subscribe(event_name);
         subscription.set(Box::new(move |mut l| {
             //println!("callback invoked with args {}", l[0]);
             //TODO abhi: this is done to avoid shifting of elements from a Vec:remove()
