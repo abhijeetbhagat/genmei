@@ -7,7 +7,6 @@ use connection::Connection;
 use transports::serversenteventstransport::ServerSentEventsTransport;
 use transports::longpollingtransport::LongPollingTransport;
 use serde_json;
-use serde_json::{Map, Value};
 use std::sync::mpsc::Sender;
 use std::option::Option;
 

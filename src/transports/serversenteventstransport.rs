@@ -4,11 +4,8 @@ use negotiationresponse::NegotiationResponse;
 use httpclient::{DefaultHttpClient, HttpClient};
 use urlbuilder::UrlBuilder;
 use serde_json;
-use serde_json::{Map, Value};
-use std::sync::mpsc::{Receiver, Sender};
-use std::sync::mpsc;
+use std::sync::mpsc::Sender;
 use std::thread;
-use std::marker::Send;
 
 pub struct ServerSentEventsTransport {
     http_client: Box<HttpClient>,
